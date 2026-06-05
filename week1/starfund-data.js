@@ -18,8 +18,8 @@ function getStartupsByStatus(searchStatus) {
 
 // 3. Function: getTotalFundingRaised()
 function getTotalFundingRaised() {
-    return startups.reduce(function(total, startup) {
-        return total + startup.raised;
+    return startups.reduce(function(total, { raised }) {
+        return total + raised;
     }, 0);
 }
 
