@@ -1,18 +1,18 @@
 // ==========================================
 // PRACTICAL CODING TASK 1: 5 Data Types
 // ==========================================
-let startupName = "StarFund Tech"; // String
-let fundingGoal = 50000;           // Number
-let isActive = true;               // Boolean
-let emptyValue = null;             // Null
-let notDefinedYet;                 // Undefined
+let startupName = "StarFund Tech";
+let fundingGoal = 50000;         
+let isActive = true;              
+let emptyValue = null;           
+let notDefinedYet;                
 
 console.log("Data types loaded.");
 
 // ==========================================
 // PRACTICAL CODING TASK 2: Grade Calculator
 // ==========================================
-let score = 85; // Change this number to test different grades
+let score = 85;
 
 if (score >= 90) {
     console.log("Grade: A");
