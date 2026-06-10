@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="StarFund - Empowering the next generation of founders through crowdfunding. Browse campaigns, favorite startups, and discover innovation.">
+    <title>StarFund | Crowdfunding for the Future</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================================
+           DAY 10: Fetch API & Local Storage — StarFund Landing Page
+           Topics: fetch(), response.json(), localStorage, async/await
+           ============================================================================ */
+
+        /* ============================================================================
+           DESIGN SYSTEM & CSS VARIABLES
+           ============================================================================ */
+        :root {
+            --bg-dark: #070a13;
+            --bg-surface: #0c1222;
+            --bg-card: rgba(15, 23, 42, 0.5);
+            --bg-card-hover: rgba(20, 30, 55, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.07);
+            --glass-border-hover: rgba(129, 140, 248, 0.3);
+
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --accent-indigo: #818cf8;
+            --accent-emerald: #34d399;
+            --accent-rose: #fb7185;
+            --accent-amber: #fbbf24;
+            --accent-cyan: #22d3ee;
+
+            --glow-indigo: rgba(99, 102, 241, 0.15);
+            --glow-emerald: rgba(52, 211, 153, 0.12);
+            --glow-rose: rgba(251, 113, 133, 0.15);
+
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+            --radius-lg: 1.25rem;
+            --radius-md: 0.75rem;
+            --radius-sm: 0.5rem;
+        }
+
+        /* ============================================================================
+           RESET & GLOBAL STYLES
+           ============================================================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(ellipse at 15% 10%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 90%, rgba(52, 211, 153, 0.04) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* ============================================================================
+           NAVIGATION BAR
+           ============================================================================ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 10, 19, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0.75rem 0;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-logo .star {
+            color: var(--accent-emerald);
+            font-size: 1.35rem;
+        }
+
+        .nav-logo .brand {
+            display: inline-block;
+            background: linear-gradient(to right, var(--accent-indigo), var(--accent-emerald));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            padding: 0.4rem 0;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-indigo);
+            transition: var(--transition-smooth);
+            border-radius: 2px;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, var(--accent-indigo), #6366f1);
+            color: white !important;
+            padding: 0.55rem 1.25rem !important;
+            border-radius: var(--radius-md);
+            font-weight: 600 !important;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-cta:hover {
+            box-shadow: 0 4px 15px var(--glow-indigo);
+            transform: translateY(-1px);
+        }
+
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        /* ============================================================================
+           HERO SECTION
+           ============================================================================ */
+        .hero {
+            padding: 5rem 0 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero .container {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .hero-content {
+            flex: 1;
+            max-width: 580px;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--accent-indigo);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            border-radius: 2rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .hero-badge .pulse {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero h1 .highlight {
+            display: inline-block;
+            background: linear-gradient(to right, var(--accent-indigo), var(--accent-emerald));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 480px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-indigo), #6366f1);
+            color: white;
+            padding: 0.85rem 2rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px var(--glow-indigo);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 0.85rem 2rem;
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .btn-secondary:hover {
+            color: var(--text-primary);
+            border-color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* Hero Illustration (right side) */
+        .hero-visual {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1.2s ease-out 0.3s both;
+        }
+
+        .hero-graphic {
+            width: 100%;
+            max-width: 420px;
+            aspect-ratio: 1;
+            background: radial-gradient(circle at 30% 30%, rgba(99, 102, 241, 0.12), transparent 60%),
+                        radial-gradient(circle at 70% 70%, rgba(52, 211, 153, 0.08), transparent 60%);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .hero-graphic::before {
+            content: '🚀';
+            font-size: 5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .hero-graphic::after {
+            content: '';
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            border: 1px dashed rgba(129, 140, 248, 0.1);
+            border-radius: 50%;
+            animation: spin 30s linear infinite;
+        }
+
+        /* ============================================================================
+           STATS BAR
+           ============================================================================ */
+        .stats-bar {
+            background: var(--bg-surface);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-number.indigo { color: var(--accent-indigo); }
+        .stat-number.emerald { color: var(--accent-emerald); }
+        .stat-number.amber { color: var(--accent-amber); }
+        .stat-number.cyan { color: var(--accent-cyan); }
+
+        .stat-description {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ============================================================================
+           FEATURED CAMPAIGNS SECTION
+           ============================================================================ */
+        .campaigns-section {
+            padding: 4rem 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-header-left h2 {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+        }
+
+        .section-header-left p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Search Bar */
+        .search-wrapper {
+            position: relative;
+            width: 320px;
+        }
+
+        .search-wrapper input {
+            width: 100%;
+            background: rgba(7, 10, 19, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 0.7rem 1rem 0.7rem 2.75rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .search-wrapper input:focus {
+            border-color: var(--accent-indigo);
+            box-shadow: 0 0 12px var(--glow-indigo);
+        }
+
+        .search-wrapper .search-icon {
+            position: absolute;
+            left: 0.9rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 1.1rem;
+            height: 1.1rem;
+            pointer-events: none;
+        }
+
+        /* Campaign Cards Grid */
+        .campaigns-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Campaign Card */
+        .campaign-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .campaign-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--glass-border-hover);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 20px var(--glow-indigo);
+        }
+
+        .card-banner {
+            height: 130px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+
+        .card-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 20%, rgba(7, 10, 19, 0.85));
+            z-index: 1;
+        }
+
+        .card-sector-tag {
+            position: relative;
+            z-index: 2;
+            background: rgba(7, 10, 19, 0.8);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-emerald);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.2rem 0.7rem;
+            border-radius: 2rem;
+        }
+
+        /* Favorite Heart Button */
+        .favorite-btn {
+            position: relative;
+            z-index: 2;
+            background: rgba(7, 10, 19, 0.7);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            color: var(--text-muted);
+        }
+
+        .favorite-btn:hover {
+            background: rgba(251, 113, 133, 0.1);
+            border-color: rgba(251, 113, 133, 0.3);
+            color: var(--accent-rose);
+        }
+
+        .favorite-btn.active {
+            background: rgba(251, 113, 133, 0.15);
+            border-color: rgba(251, 113, 133, 0.35);
+            color: var(--accent-rose);
+            animation: heartPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .favorite-btn .heart-outline,
+        .favorite-btn .heart-filled {
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            transition: var(--transition-smooth);
+        }
+
+        .favorite-btn .heart-filled {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .favorite-btn.active .heart-outline {
+            opacity: 0;
+            transform: scale(0);
+        }
+
+        .favorite-btn.active .heart-filled {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Card Content */
+        .card-content {
+            padding: 1.25rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            margin-bottom: 1.25rem;
+            flex-grow: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Progress */
+        .card-progress {
+            margin-bottom: 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .progress-header .label { color: var(--text-muted); }
+        .progress-header .percent { color: var(--accent-emerald); font-weight: 700; }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent-indigo), var(--accent-emerald));
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Card Stats */
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 1rem;
+        }
+
+        .card-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-stat .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.15rem;
+        }
+
+        .card-stat .value {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* ============================================================================
+           LOADING STATE
+           ============================================================================ */
+        .loading-state {
+            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--glass-border);
+            border-top-color: var(--accent-indigo);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-state p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3.5rem 2rem;
+            background: var(--bg-card);
+            border: 1px dashed var(--glass-border);
+            border-radius: var(--radius-lg);
+        }
+
+        .empty-state h3 {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ============================================================================
+           CACHE STATUS BADGE
+           ============================================================================ */
+        .cache-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            margin-left: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .cache-badge.from-cache {
+            background: rgba(52, 211, 153, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+            color: var(--accent-emerald);
+        }
+
+        .cache-badge.from-api {
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--accent-indigo);
+        }
+
+        .cache-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* ============================================================================
+           FOOTER
+           ============================================================================ */
+        footer {
+            border-top: 1px solid var(--glass-border);
+            padding: 2.5rem 0;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-indigo);
+        }
+
+        /* ============================================================================
+           TOAST NOTIFICATION
+           ============================================================================ */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid var(--glass-border-hover);
+            border-radius: var(--radius-md);
+            padding: 0.9rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 200;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            max-width: 360px;
+        }
+
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            flex-shrink: 0;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .toast-icon.heart { color: var(--accent-rose); }
+        .toast-icon.check { color: var(--accent-emerald); }
+
+        .toast p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .toast p strong {
+            color: var(--text-primary);
+        }
+
+        /* ============================================================================
+           ANIMATIONS
+           ============================================================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes heartPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ============================================================================
+           RESPONSIVE
+           ============================================================================ */
+        @media (max-width: 768px) {
+            .hero .container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero h1 { font-size: 2.5rem; }
+            .hero-description { margin: 0 auto 2rem; }
+            .hero-actions { justify-content: center; }
+            .hero-visual { order: -1; }
+            .hero-graphic { max-width: 240px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .section-header { flex-direction: column; align-items: stretch; }
+            .search-wrapper { width: 100%; }
+            .campaigns-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .footer-content { flex-direction: column; gap: 1rem; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="nav-logo">
+                <span class="star">★</span>
+                <span class="brand">StarFund</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#campaigns">Browse</a></li>
+                <li><a href="#stats">How It Works</a></li>
+                <li><a href="#">Login</a></li>
+                <li><a href="#" class="nav-cta">Register</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="pulse"></span>
+                    Live Campaigns
+                </div>
+                <h1>Fund the <span class="highlight">Future</span> of Innovation</h1>
+                <p class="hero-description">
+                    Discover groundbreaking startups, back visionary founders, and be part of the next wave of technological disruption — all through StarFund's crowdfunding platform.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn-primary" onclick="document.getElementById('campaigns').scrollIntoView({ behavior: 'smooth' })">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        Explore Startups
+                    </button>
+                    <button class="btn-secondary">Learn More</button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-graphic"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar" id="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number indigo" id="stat-funded">$0</span>
+                    <span class="stat-description">Total Funded</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number emerald" id="stat-startups">0</span>
+                    <span class="stat-description">Active Startups</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number amber" id="stat-investors">0</span>
+                    <span class="stat-description">Total Investors</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number cyan" id="stat-favorites">0</span>
+                    <span class="stat-description">Your Favorites</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Campaigns Section -->
+    <section class="campaigns-section" id="campaigns">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-header-left">
+                    <h2>
+                        Featured Campaigns
+                        <span class="cache-badge" id="cache-badge" style="display:none;">
+                            <span class="cache-dot"></span>
+                            <span class="cache-text"></span>
+                        </span>
+                    </h2>
+                    <p>Explore innovative startups seeking their next round of funding</p>
+                </div>
+                <div class="search-wrapper">
+                    <input type="text" id="search-input" placeholder="Search campaigns..." aria-label="Search campaigns">
+                    <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="campaigns-grid" id="campaigns-grid">
+                <!-- Loading state shown initially -->
+                <div class="loading-state" id="loading-state">
+                    <div class="spinner"></div>
+                    <p>Fetching campaign data...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <span class="footer-text">&copy; 2026 StarFund. Built for the StarFund Internship — Week 2, Day 10.</span>
+                <ul class="footer-links">
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" role="alert" aria-live="polite">
+        <svg class="toast-icon heart" id="toast-icon" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+        <p id="toast-message">Notification message</p>
+    </div>
+
+    <!-- ================================================================
+         JAVASCRIPT — Fetch API, localStorage, Dynamic Rendering
+         ================================================================ -->
+    <script>
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        const MOCK_API_URL = "https://jsonplaceholder.typicode.com/users";
+        const CACHE_KEY = "starfund_campaigns_cache";
+        const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+        const FAVORITES_KEY = "starfund_favorites";
+
+        // ==========================================
+        // STATE
+        // ==========================================
+        let campaigns = [];
+        let favorites = loadFavorites();
+
+        // ==========================================
+        // LOCAL STORAGE HELPERS
+        // ==========================================
+
+        /**
+         * Loads favorites from localStorage.
+         * Returns a Set of favorited campaign IDs.
+         */
+        function loadFavorites() {
+            try {
+                const stored = localStorage.getItem(FAVORITES_KEY);
+                if (stored) {
+                    return new Set(JSON.parse(stored));
+                }
+            } catch (e) {
+                console.warn("Failed to load favorites from localStorage:", e);
+            }
+            return new Set();
+        }
+
+        /**
+         * Saves the current favorites Set to localStorage.
+         */
+        function saveFavorites() {
+            try {
+                localStorage.setItem(FAVORITES_KEY, JSON.stringify([...favorites]));
+            } catch (e) {
+                console.warn("Failed to save favorites to localStorage:", e);
+            }
+        }
+
+        /**
+         * Toggles a campaign's favorite status.
+         */
+        function toggleFavorite(id) {
+            const startup = campaigns.find(c => c.id === id);
+            if (favorites.has(id)) {
+                favorites.delete(id);
+                showToast(`Removed <strong>${startup ? startup.name : ''}</strong> from favorites`, "check");
+            } else {
+                favorites.add(id);
+                showToast(`Added <strong>${startup ? startup.name : ''}</strong> to favorites`, "heart");
+            }
+            saveFavorites();
+            updateFavoriteCount();
+
+            // Update button state without full re-render
+            const btn = document.querySelector(`.favorite-btn[data-id="${id}"]`);
+            if (btn) {
+                btn.classList.toggle("active", favorites.has(id));
+            }
+        }
+
+        /**
+         * Caches fetched data in localStorage with a timestamp.
+         */
+        function cacheData(data) {
+            try {
+                const cacheEntry = {
+                    timestamp: Date.now(),
+                    data: data
+                };
+                localStorage.setItem(CACHE_KEY, JSON.stringify(cacheEntry));
+            } catch (e) {
+                console.warn("Failed to cache data in localStorage:", e);
+            }
+        }
+
+        /**
+         * Retrieves cached data if still within TTL window.
+         * Returns null if cache is expired or missing.
+         */
+        function getCachedData() {
+            try {
+                const stored = localStorage.getItem(CACHE_KEY);
+                if (!stored) return null;
+
+                const cacheEntry = JSON.parse(stored);
+                const age = Date.now() - cacheEntry.timestamp;
+
+                if (age < CACHE_TTL) {
+                    return cacheEntry.data;
+                }
+                // Cache expired — remove it
+                localStorage.removeItem(CACHE_KEY);
+            } catch (e) {
+                console.warn("Failed to read cache from localStorage:", e);
+            }
+            return null;
+        }
+
+        // ==========================================
+        // FETCH API — Data Retrieval with Caching
+        // ==========================================
+
+        /**
+         * Transforms raw API user data into StarFund campaign objects.
+         * Maps jsonplaceholder user fields into startup-themed data.
+         */
+        function transformApiData(users) {
+            const sectors = ["Healthcare AI", "Aerospace", "Fintech", "Agriculture", "Clean Energy", "Cybersecurity"];
+            const gradients = [
+                "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                "linear-gradient(135deg, #f59e0b, #d97706)",
+                "linear-gradient(135deg, #10b981, #059669)",
+                "linear-gradient(135deg, #06b6d4, #0891b2)",
+                "linear-gradient(135deg, #ec4899, #be185d)",
+                "linear-gradient(135deg, #6366f1, #4f46e5)",
+                "linear-gradient(135deg, #14b8a6, #0d9488)",
+                "linear-gradient(135deg, #f43f5e, #e11d48)",
+                "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+                "linear-gradient(135deg, #eab308, #ca8a04)"
+            ];
+            const descriptions = [
+                "Revolutionizing patient care with real-time diagnostic AI models that analyze clinical scans in under 10 seconds.",
+                "Next-generation autonomous cargo drones configured for rural medical deliveries across emerging markets.",
+                "Decentralized micro-finance protocols providing collateralized loans for emerging-market startups.",
+                "Smart hydroponic farming pods using IoT sensors to reduce commercial irrigation waste by 95%.",
+                "Peer-to-peer neighborhood microgrids optimizing decentralized solar energy distribution networks.",
+                "Zero-trust network defense using reinforcement learning to deflect real-time server exploits.",
+                "AI-powered supply chain analytics platform reducing logistics costs by up to 40%.",
+                "Blockchain-verified carbon credit marketplace connecting reforestation projects with global enterprises.",
+                "Neural interface headsets enabling hands-free computing for accessibility and productivity.",
+                "Quantum-resistant encryption SDK protecting enterprise communications from next-gen threats."
+            ];
+
+            return users.map((user, index) => ({
+                id: user.id,
+                name: user.company ? user.company.name : user.name,
+                sector: sectors[index % sectors.length],
+                description: descriptions[index % descriptions.length],
+                raised: Math.floor(Math.random() * 150000) + 20000,
+                goal: Math.floor(Math.random() * 100000) + 100000,
+                investors: Math.floor(Math.random() * 200) + 15,
+                bannerGradient: gradients[index % gradients.length]
+            }));
+        }
+
+        /**
+         * Fetches startup data from mock API with localStorage caching.
+         * Uses async/await as required by the review checklist.
+         */
+        async function fetchStartups() {
+            // Step 1: Check localStorage cache first
+            const cached = getCachedData();
+            if (cached) {
+                console.log("[Cache] Loaded campaign data from localStorage cache.");
+                showCacheBadge(true);
+                return cached;
+            }
+
+            // Step 2: Fetch from API
+            console.log("[API] Fetching campaign data from:", MOCK_API_URL);
+            showCacheBadge(false);
+
+            try {
+                const response = await fetch(MOCK_API_URL);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const rawData = await response.json();
+                const transformed = transformApiData(rawData);
+
+                // Step 3: Cache in localStorage
+                cacheData(transformed);
+                console.log("[Cache] Campaign data cached in localStorage (TTL: 5 min).");
+
+                return transformed;
+            } catch (error) {
+                console.error("[API] Fetch failed:", error);
+                throw error;
+            }
+        }
+
+        // ==========================================
+        // REUSABLE CARD FACTORY — createCampaignCard(data)
+        // ==========================================
+
+        /**
+         * Creates and returns a campaign card HTML element.
+         * Reusable function as required by Implementation Tasks.
+         */
+        function createCampaignCard(data) {
+            const percent = Math.min(Math.round((data.raised / data.goal) * 100), 100);
+            const isFav = favorites.has(data.id);
+
+            const card = document.createElement("article");
+            card.className = "campaign-card";
+            card.style.animation = `cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both`;
+            card.setAttribute("data-campaign-id", data.id);
+
+            card.innerHTML = `
+                <div class="card-banner" style="background: ${data.bannerGradient}">
+                    <span class="card-sector-tag">${data.sector}</span>
+                    <button class="favorite-btn ${isFav ? 'active' : ''}" data-id="${data.id}" type="button" aria-label="Toggle favorite">
+                        <svg class="heart-outline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                        </svg>
+                        <svg class="heart-filled" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">${data.name}</h3>
+                    <p class="card-description">${data.description}</p>
+                    <div class="card-progress">
+                        <div class="progress-header">
+                            <span class="label">Funding Progress</span>
+                            <span class="percent">${percent}%</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                    <div class="card-stats">
+                        <div class="card-stat">
+                            <span class="label">Raised</span>
+                            <span class="value">${formatCurrency(data.raised)}</span>
+                        </div>
+                        <div class="card-stat">
+                            <span class="label">Goal</span>
+                            <span class="value">${formatCurrency(data.goal)}</span>
+                        </div>
+                        <div class="card-stat">
+                            <span class="label">Investors</span>
+                            <span class="value">${data.investors}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Attach favorite toggle event listener (no onclick attribute)
+            const favBtn = card.querySelector(".favorite-btn");
+            favBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                toggleFavorite(data.id);
+            });
+
+            return card;
+        }
+
+        // ==========================================
+        // UI RENDERING
+        // ==========================================
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        /**
+         * Renders a list of campaigns into the grid.
+         */
+        function renderCampaigns(dataList) {
+            const grid = document.getElementById("campaigns-grid");
+            grid.innerHTML = "";
+
+            if (dataList.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Campaigns Found</h3>
+                        <p>No startups match your search query. Try a different keyword.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            dataList.forEach((startup, index) => {
+                const card = createCampaignCard(startup);
+                card.style.animationDelay = `${index * 0.08}s`;
+                grid.appendChild(card);
+            });
+        }
+
+        /**
+         * Updates the stats bar with calculated totals.
+         */
+        function updateStats() {
+            const totalFunded = campaigns.reduce((sum, c) => sum + c.raised, 0);
+            const totalInvestors = campaigns.reduce((sum, c) => sum + c.investors, 0);
+
+            document.getElementById("stat-funded").textContent = formatCurrency(totalFunded);
+            document.getElementById("stat-startups").textContent = campaigns.length;
+            document.getElementById("stat-investors").textContent = totalInvestors.toLocaleString();
+            updateFavoriteCount();
+        }
+
+        function updateFavoriteCount() {
+            document.getElementById("stat-favorites").textContent = favorites.size;
+        }
+
+        /**
+         * Shows the cache source badge.
+         */
+        function showCacheBadge(fromCache) {
+            const badge = document.getElementById("cache-badge");
+            const text = badge.querySelector(".cache-text");
+
+            badge.style.display = "inline-flex";
+            badge.className = "cache-badge " + (fromCache ? "from-cache" : "from-api");
+            text.textContent = fromCache ? "Cached" : "Live API";
+        }
+
+        // ==========================================
+        // REAL-TIME SEARCH
+        // ==========================================
+
+        function handleSearch() {
+            const query = document.getElementById("search-input").value.toLowerCase().trim();
+
+            const filtered = campaigns.filter(startup =>
+                startup.name.toLowerCase().includes(query) ||
+                startup.description.toLowerCase().includes(query) ||
+                startup.sector.toLowerCase().includes(query)
+            );
+
+            renderCampaigns(filtered);
+        }
+
+        // ==========================================
+        // TOAST NOTIFICATION
+        // ==========================================
+        let toastTimeout = null;
+
+        function showToast(message, iconType) {
+            const toast = document.getElementById("toast");
+            const toastMsg = document.getElementById("toast-message");
+            const toastIcon = document.getElementById("toast-icon");
+
+            toastMsg.innerHTML = message;
+            toastIcon.className = `toast-icon ${iconType}`;
+
+            toast.classList.add("active");
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove("active");
+            }, 2500);
+        }
+
+        // ==========================================
+        // APP INITIALIZATION
+        // ==========================================
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const loadingState = document.getElementById("loading-state");
+
+            try {
+                // Fetch data (from cache or API)
+                campaigns = await fetchStartups();
+
+                // Remove loading spinner
+                loadingState.remove();
+
+                // Render cards and stats
+                renderCampaigns(campaigns);
+                updateStats();
+
+            } catch (error) {
+                loadingState.innerHTML = `
+                    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="var(--accent-rose)">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                    <p>Failed to load campaigns. Please refresh the page.</p>
+                `;
+            }
+
+            // Attach real-time search listener
+            document.getElementById("search-input").addEventListener("input", handleSearch);
+        });
+    </script>
+</body>
+</html>
