@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 11 — Semantic Campaign Card | StarFund</title>
+    <meta
+      name="description"
+      content="Week 3, Day 11 practical task: StarFund campaign card rebuilt using only semantic HTML5 elements and raw CSS — no divs allowed."
+    />
+    <style>
+      /* =====================================================
+         GLOBAL RESET & BOX MODEL
+         Using border-box so padding doesn't blow out widths.
+         ===================================================== */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* =====================================================
+         DESIGN TOKENS — CSS Custom Properties
+         ===================================================== */
+      :root {
+        --color-primary: #6c47ff;
+        --color-primary-light: #8b6bff;
+        --color-primary-dark: #4c2ee0;
+        --color-accent: #00d4aa;
+        --color-success: #22c55e;
+        --color-warning: #f59e0b;
+        --color-danger: #ef4444;
+
+        --color-bg: #0f0d1a;
+        --color-surface: #1a1730;
+        --color-surface-raised: #221f3a;
+        --color-border: rgba(108, 71, 255, 0.25);
+
+        --color-text-primary: #f1eeff;
+        --color-text-secondary: #a09bcc;
+        --color-text-muted: #6b6490;
+
+        --radius-sm: 8px;
+        --radius-md: 14px;
+        --radius-lg: 20px;
+
+        --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4),
+          0 2px 8px rgba(108, 71, 255, 0.15);
+        --shadow-glow: 0 0 40px rgba(108, 71, 255, 0.2);
+
+        --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+        --font-mono: "Fira Code", "Consolas", monospace;
+
+        --transition: 0.25s ease;
+      }
+
+      /* =====================================================
+         BASE PAGE LAYOUT
+         ===================================================== */
+      body {
+        font-family: var(--font-sans);
+        background-color: var(--color-bg);
+        color: var(--color-text-primary);
+        min-height: 100vh;
+        padding: 48px 24px;
+        line-height: 1.6;
+      }
+
+      /* Import Google Font */
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+      /* =====================================================
+         PAGE HEADER (for the demo page itself)
+         ===================================================== */
+      .page-intro {
+        max-width: 860px;
+        margin: 0 auto 48px auto;
+        text-align: center;
+      }
+
+      .page-intro h1 {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--color-primary-light);
+        margin-bottom: 8px;
+      }
+
+      .page-intro p {
+        color: var(--color-text-secondary);
+        font-size: 1rem;
+      }
+
+      .badge-semantic {
+        display: inline-block;
+        background: rgba(0, 212, 170, 0.15);
+        color: var(--color-accent);
+        border: 1px solid rgba(0, 212, 170, 0.3);
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+      }
+
+      .cards-grid {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+        justify-content: center;
+      }
+
+      /* =====================================================
+         CAMPAIGN CARD — SEMANTIC HTML (no divs!)
+         Using: article > header, section, footer
+
+         SEMANTIC BREAKDOWN:
+         <article>   = the entire self-contained card
+         <header>    = card top: image + status badge + category
+         <section>   = main info: title, description, team
+         <footer>    = card bottom: progress bar + funding stats
+         ===================================================== */
+
+      /* The card itself — <article> replaces <div class="card"> */
+      article.campaign-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        width: 340px;
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+        transition: transform var(--transition), box-shadow var(--transition),
+          border-color var(--transition);
+        position: relative;
+      }
+
+      article.campaign-card:hover {
+        transform: translateY(-6px);
+        box-shadow: var(--shadow-glow);
+        border-color: rgba(108, 71, 255, 0.5);
+      }
+
+      /* ─── CARD HEADER: cover image + badges ─── */
+      article.campaign-card > header {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+        background: linear-gradient(
+          135deg,
+          var(--color-primary-dark),
+          var(--color-primary)
+        );
+      }
+
+      article.campaign-card > header img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.4s ease;
+      }
+
+      article.campaign-card:hover > header img {
+        transform: scale(1.05);
+      }
+
+      /* Status badge — <mark> for highlighted status */
+      article.campaign-card > header mark.status-badge {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        padding: 4px 10px;
+        border-radius: 100px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        background-color: rgba(0, 0, 0, 0);
+      }
+
+      mark.status-badge[data-status="active"] {
+        background: rgba(0, 212, 170, 0.85);
+        color: #003d33;
+        box-shadow: 0 2px 8px rgba(0, 212, 170, 0.4);
+      }
+
+      mark.status-badge[data-status="funded"] {
+        background: rgba(108, 71, 255, 0.85);
+        color: #fff;
+      }
+
+      mark.status-badge[data-status="pending"] {
+        background: rgba(245, 158, 11, 0.85);
+        color: #4a2e00;
+      }
+
+      /* Category pill — <small> for secondary annotation */
+      article.campaign-card > header small.category-pill {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        background: rgba(0, 0, 0, 0.55);
+        color: var(--color-text-secondary);
+        padding: 4px 10px;
+        border-radius: 100px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px);
+      }
+
+      /* Gradient overlay at bottom of header */
+      article.campaign-card > header::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: linear-gradient(to top, var(--color-surface), transparent);
+        pointer-events: none;
+      }
+
+      /* ─── CARD SECTION: main content ─── */
+      article.campaign-card > section.card-body {
+        padding: 20px 22px 16px;
+      }
+
+      article.campaign-card > section.card-body h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        margin-bottom: 8px;
+        line-height: 1.3;
+      }
+
+      article.campaign-card > section.card-body p.card-description {
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+        line-height: 1.55;
+        margin-bottom: 16px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      /* Team info — using <address> for contact/attribution */
+      article.campaign-card > section.card-body address.founder-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-style: normal;
+        margin-bottom: 16px;
+      }
+
+      address.founder-info figure {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid var(--color-primary);
+        flex-shrink: 0;
+        margin: 0;
+      }
+
+      address.founder-info figure img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      address.founder-info figcaption {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      address.founder-info figcaption strong {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+
+      address.founder-info figcaption span {
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+      }
+
+      /* Stats row inside section */
+      section.card-stats {
+        display: flex;
+        gap: 0;
+        background: var(--color-surface-raised);
+        border-radius: var(--radius-sm);
+        padding: 12px 0;
+        margin-bottom: 16px;
+        overflow: hidden;
+        border: 1px solid var(--color-border);
+      }
+
+      section.card-stats > dl {
+        flex: 1;
+        text-align: center;
+        padding: 0 12px;
+        border-right: 1px solid var(--color-border);
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      section.card-stats > dl:last-child {
+        border-right: none;
+      }
+
+      section.card-stats dt {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      section.card-stats dd {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+      }
+
+      section.card-stats dd.accent {
+        color: var(--color-accent);
+      }
+
+      /* ─── CARD FOOTER: funding progress ─── */
+      article.campaign-card > footer.card-footer {
+        padding: 0 22px 22px;
+        border-top: 1px solid var(--color-border);
+        padding-top: 16px;
+      }
+
+      footer.card-footer .progress-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      footer.card-footer .progress-label span {
+        font-size: 0.8rem;
+        color: var(--color-text-secondary);
+      }
+
+      footer.card-footer .progress-label strong {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--color-accent);
+      }
+
+      /* Progress bar — using <meter> semantic element */
+      footer.card-footer meter.funding-meter {
+        display: block;
+        width: 100%;
+        height: 8px;
+        border-radius: 100px;
+        overflow: hidden;
+        border: none;
+        background: var(--color-surface-raised);
+        margin-bottom: 16px;
+        /* Note: styling <meter> requires vendor-specific pseudo-elements */
+      }
+
+      /* Chrome / Safari */
+      footer.card-footer meter.funding-meter::-webkit-meter-bar {
+        background: var(--color-surface-raised);
+        border-radius: 100px;
+        border: none;
+      }
+
+      footer.card-footer meter.funding-meter::-webkit-meter-optimum-value {
+        background: linear-gradient(
+          90deg,
+          var(--color-primary),
+          var(--color-accent)
+        );
+        border-radius: 100px;
+      }
+
+      /* Firefox */
+      footer.card-footer meter.funding-meter::-moz-meter-bar {
+        background: linear-gradient(
+          90deg,
+          var(--color-primary),
+          var(--color-accent)
+        );
+        border-radius: 100px;
+      }
+
+      /* Time remaining — using <time> semantic element */
+      footer.card-footer time.deadline {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        color: var(--color-text-muted);
+        margin-bottom: 16px;
+      }
+
+      footer.card-footer time.deadline::before {
+        content: "⏱";
+        font-size: 0.85rem;
+      }
+
+      /* CTA button — <button> is semantic by default */
+      footer.card-footer button.btn-invest {
+        width: 100%;
+        padding: 12px;
+        background: var(--color-primary);
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 700;
+        border: none;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        letter-spacing: 0.02em;
+        transition: background var(--transition), transform 0.15s ease,
+          box-shadow var(--transition);
+      }
+
+      footer.card-footer button.btn-invest:hover {
+        background: var(--color-primary-light);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(108, 71, 255, 0.45);
+      }
+
+      footer.card-footer button.btn-invest:active {
+        transform: translateY(0);
+      }
+
+      /* =====================================================
+         EXPLAINER PANEL — inline code annotations
+         ===================================================== */
+      .explainer {
+        max-width: 860px;
+        margin: 60px auto 0;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 28px 32px;
+      }
+
+      .explainer h2 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--color-primary-light);
+        margin-bottom: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .explainer table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+
+      .explainer th,
+      .explainer td {
+        text-align: left;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .explainer th {
+        color: var(--color-text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.06em;
+      }
+
+      .explainer td:first-child {
+        color: var(--color-accent);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+      }
+
+      .explainer td:last-child {
+        color: var(--color-text-secondary);
+      }
+
+      .explainer tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* =====================================================
+         RESPONSIVE — single column on small screens
+         ===================================================== */
+      @media (max-width: 768px) {
+        body {
+          padding: 32px 16px;
+        }
+
+        .cards-grid {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        article.campaign-card {
+          width: 100%;
+          max-width: 400px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- =====================================================
+         PAGE INTRO (demo page wrapper — one <header> per section)
+         ===================================================== -->
+    <header class="page-intro">
+      <p class="badge-semantic">Week 3 · Day 11 · Practical Task</p>
+      <h1>Semantic Campaign Cards</h1>
+      <p>
+        StarFund campaign cards rebuilt using only semantic HTML5 — no
+        <code>&lt;div&gt;</code> elements. Styled with raw CSS and the box
+        model.
+      </p>
+    </header>
+
+    <!-- =====================================================
+         CARDS GRID
+         ===================================================== -->
+    <main>
+      <section class="cards-grid" aria-label="Campaign card examples">
+        <!-- ─────────────────────────────────────────────
+             CARD 1 — EthioSolar Energy (Active)
+             Structure: article > header + section + footer
+             ───────────────────────────────────────────── -->
+        <article class="campaign-card" aria-label="EthioSolar Energy campaign">
+          <!-- header: image, status badge, category pill -->
+          <header>
+            <img
+              src="https://images.unsplash.com/photo-1509391366360-2e959784a276?w=600&q=80"
+              alt="Solar panels on an Ethiopian rooftop at sunrise"
+              width="340"
+              height="200"
+            />
+            <mark class="status-badge" data-status="active">Active</mark>
+            <small class="category-pill">CleanTech</small>
+          </header>
+
+          <!-- section: title, description, founder info, stats -->
+          <section class="card-body">
+            <h2>EthioSolar Energy</h2>
+            <p class="card-description">
+              Bringing affordable solar microgrids to rural Ethiopian
+              communities. Each unit powers 40 homes and eliminates kerosene
+              dependency — improving health outcomes while generating clean
+              returns.
+            </p>
+
+            <!-- address: semantic element for founder attribution -->
+            <address class="founder-info">
+              <figure>
+                <img
+                  src="https://i.pravatar.cc/72?img=12"
+                  alt="Profile photo of Amir Bekele"
+                  width="36"
+                  height="36"
+                />
+                <figcaption>
+                  <strong>Amir Bekele</strong>
+                  <span>Founder &amp; CEO</span>
+                </figcaption>
+              </figure>
+            </address>
+
+            <!-- Funding stats using dl > dt + dd (description list — semantic!) -->
+            <section class="card-stats" aria-label="Campaign funding statistics">
+              <dl>
+                <dt>Raised</dt>
+                <dd class="accent">$284K</dd>
+              </dl>
+              <dl>
+                <dt>Goal</dt>
+                <dd>$400K</dd>
+              </dl>
+              <dl>
+                <dt>Investors</dt>
+                <dd>142</dd>
+              </dl>
+            </section>
+          </section>
+
+          <!-- footer: progress meter, deadline, CTA -->
+          <footer class="card-footer">
+            <p class="progress-label">
+              <span>Funding Progress</span>
+              <strong>71%</strong>
+            </p>
+
+            <!-- meter: native semantic progress indicator -->
+            <meter
+              class="funding-meter"
+              min="0"
+              max="400000"
+              value="284000"
+              optimum="400000"
+              low="100000"
+              high="350000"
+              title="$284,000 of $400,000 raised"
+            ></meter>
+
+            <!-- time: semantic element for dates -->
+            <time class="deadline" datetime="2026-07-15">
+              15 days remaining — ends July 15, 2026
+            </time>
+
+            <!-- button: inherently semantic interactive element -->
+            <button class="btn-invest" type="button" id="invest-btn-ethiosolar">
+              Invest in EthioSolar
+            </button>
+          </footer>
+        </article>
+
+        <!-- ─────────────────────────────────────────────
+             CARD 2 — HabeConnect Logistics (Active)
+             ───────────────────────────────────────────── -->
+        <article
+          class="campaign-card"
+          aria-label="HabeConnect Logistics campaign"
+        >
+          <header>
+            <img
+              src="https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?w=600&q=80"
+              alt="Package delivery motorbike in Addis Ababa"
+              width="340"
+              height="200"
+            />
+            <mark class="status-badge" data-status="active">Active</mark>
+            <small class="category-pill">Logistics</small>
+          </header>
+
+          <section class="card-body">
+            <h2>HabeConnect Logistics</h2>
+            <p class="card-description">
+              Last-mile delivery network connecting e-commerce sellers to
+              consumers in Addis Ababa using an AI-optimised motorbike fleet.
+              Already processing 2,000 daily deliveries.
+            </p>
+
+            <address class="founder-info">
+              <figure>
+                <img
+                  src="https://i.pravatar.cc/72?img=47"
+                  alt="Profile photo of Sara Tesfaye"
+                  width="36"
+                  height="36"
+                />
+                <figcaption>
+                  <strong>Sara Tesfaye</strong>
+                  <span>Founder &amp; COO</span>
+                </figcaption>
+              </figure>
+            </address>
+
+            <section class="card-stats" aria-label="Campaign funding statistics">
+              <dl>
+                <dt>Raised</dt>
+                <dd class="accent">$512K</dd>
+              </dl>
+              <dl>
+                <dt>Goal</dt>
+                <dd>$600K</dd>
+              </dl>
+              <dl>
+                <dt>Investors</dt>
+                <dd>238</dd>
+              </dl>
+            </section>
+          </section>
+
+          <footer class="card-footer">
+            <p class="progress-label">
+              <span>Funding Progress</span>
+              <strong>85%</strong>
+            </p>
+
+            <meter
+              class="funding-meter"
+              min="0"
+              max="600000"
+              value="512000"
+              optimum="600000"
+              low="150000"
+              high="500000"
+              title="$512,000 of $600,000 raised"
+            ></meter>
+
+            <time class="deadline" datetime="2026-07-08">
+              8 days remaining — ends July 8, 2026
+            </time>
+
+            <button
+              class="btn-invest"
+              type="button"
+              id="invest-btn-habeconnect"
+            >
+              Invest in HabeConnect
+            </button>
+          </footer>
+        </article>
+
+        <!-- ─────────────────────────────────────────────
+             CARD 3 — AgriVision AI (Funded!)
+             ───────────────────────────────────────────── -->
+        <article class="campaign-card" aria-label="AgriVision AI campaign">
+          <header>
+            <img
+              src="https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=600&q=80"
+              alt="Smart farming drone flying over Ethiopian crop fields"
+              width="340"
+              height="200"
+            />
+            <mark class="status-badge" data-status="funded">Funded</mark>
+            <small class="category-pill">AgriTech</small>
+          </header>
+
+          <section class="card-body">
+            <h2>AgriVision AI</h2>
+            <p class="card-description">
+              Machine-learning crop disease detection via smartphone camera.
+              Farmers photograph their plants and receive instant diagnosis +
+              treatment recommendations — available offline.
+            </p>
+
+            <address class="founder-info">
+              <figure>
+                <img
+                  src="https://i.pravatar.cc/72?img=33"
+                  alt="Profile photo of Dawit Haile"
+                  width="36"
+                  height="36"
+                />
+                <figcaption>
+                  <strong>Dawit Haile</strong>
+                  <span>Founder &amp; CTO</span>
+                </figcaption>
+              </figure>
+            </address>
+
+            <section class="card-stats" aria-label="Campaign funding statistics">
+              <dl>
+                <dt>Raised</dt>
+                <dd class="accent">$750K</dd>
+              </dl>
+              <dl>
+                <dt>Goal</dt>
+                <dd>$750K</dd>
+              </dl>
+              <dl>
+                <dt>Investors</dt>
+                <dd>311</dd>
+              </dl>
+            </section>
+          </section>
+
+          <footer class="card-footer">
+            <p class="progress-label">
+              <span>Funding Progress</span>
+              <strong>100% ✓</strong>
+            </p>
+
+            <meter
+              class="funding-meter"
+              min="0"
+              max="750000"
+              value="750000"
+              optimum="750000"
+              low="200000"
+              high="700000"
+              title="Fully funded: $750,000 of $750,000"
+            ></meter>
+
+            <time class="deadline" datetime="2026-06-01">
+              Campaign closed — June 1, 2026
+            </time>
+
+            <button
+              class="btn-invest"
+              type="button"
+              id="invest-btn-agrivision"
+              disabled
+              style="
+                opacity: 0.5;
+                cursor: not-allowed;
+                background: var(--color-surface-raised);
+              "
+            >
+              Campaign Fully Funded
+            </button>
+          </footer>
+        </article>
+      </section>
+
+      <!-- =====================================================
+           EXPLAINER TABLE — semantic elements used
+           ===================================================== -->
+      <aside class="explainer" aria-label="Semantic elements reference">
+        <h2>Semantic Elements Used in These Cards</h2>
+        <table>
+          <caption style="display: none">
+            HTML5 semantic elements and their purpose in the campaign card
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Element</th>
+              <th scope="col">Role in the Card</th>
+              <th scope="col">Replaces</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>&lt;article&gt;</td>
+              <td>Self-contained campaign card (shareable, independent)</td>
+              <td>&lt;div class="card"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;header&gt;</td>
+              <td>Card top section — cover image + status badge</td>
+              <td>&lt;div class="card-header"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;section&gt;</td>
+              <td>Main body content group + stats block</td>
+              <td>&lt;div class="card-body"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;footer&gt;</td>
+              <td>Card bottom — progress meter, deadline, CTA</td>
+              <td>&lt;div class="card-footer"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;address&gt;</td>
+              <td>Founder attribution (contact/author info)</td>
+              <td>&lt;div class="founder"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;figure&gt; / &lt;figcaption&gt;</td>
+              <td>Founder avatar + name/title caption</td>
+              <td>&lt;div class="avatar-wrap"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;mark&gt;</td>
+              <td>Status badge (Active / Funded / Pending)</td>
+              <td>&lt;span class="badge"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;meter&gt;</td>
+              <td>Native funding progress indicator</td>
+              <td>&lt;div class="progress-bar"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;time&gt;</td>
+              <td>Campaign deadline (machine-readable)</td>
+              <td>&lt;span class="deadline"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;dl&gt; / &lt;dt&gt; / &lt;dd&gt;</td>
+              <td>Stats key-value pairs (Raised, Goal, Investors)</td>
+              <td>&lt;div class="stat"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;small&gt;</td>
+              <td>Category pill annotation</td>
+              <td>&lt;span class="category"&gt;</td>
+            </tr>
+            <tr>
+              <td>&lt;button&gt;</td>
+              <td>Invest CTA (inherently semantic)</td>
+              <td>&lt;div class="btn"&gt; ❌</td>
+            </tr>
+          </tbody>
+        </table>
+      </aside>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 11 — Twitter/X Profile Card | StarFund Internship</title>
+    <meta name="description" content="Week 3, Practical Exercise 11: Recreate the Twitter/X profile card in pure CSS (no libraries) using semantic HTML and custom styling.">
+    <style>
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Chirp:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --color-twitter-black: #000000;
+            --color-twitter-dark-gray: #16181c;
+            --color-twitter-border: #2f3336;
+            --color-twitter-gray: #71767b;
+            --color-twitter-white: #e7e9ea;
+            --color-twitter-blue: #1d9bf0;
+            --color-twitter-blue-hover: #1a8cd8;
+            --font-chirp: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --transition: all 0.2s ease;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-chirp);
+            background-color: #0f1419;
+            color: var(--color-twitter-white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        /* Title block */
+        .exercise-title {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .exercise-title h1 {
+            font-size: 1.5rem;
+            color: var(--color-twitter-white);
+            margin-bottom: 4px;
+        }
+
+        .exercise-title p {
+            color: var(--color-twitter-gray);
+            font-size: 0.9rem;
+        }
+
+        /* --------------------------------------------------
+           TWITTER / X PROFILE CARD (Article / semantic)
+           -------------------------------------------------- */
+        article.profile-card {
+            background-color: var(--color-twitter-black);
+            border: 1px solid var(--color-twitter-border);
+            width: 100%;
+            max-width: 350px;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Header Banner section */
+        article.profile-card > header.banner-area {
+            position: relative;
+            height: 120px;
+            background: linear-gradient(135deg, #1d9bf0 0%, #002d62 100%);
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Profile details container - using section for structure */
+        article.profile-card > section.profile-details {
+            padding: 0 16px 16px 16px;
+            position: relative;
+        }
+
+        /* Avatar positioning container (no div, using picture/figure) */
+        article.profile-card > section.profile-details > figure.avatar-holder {
+            position: absolute;
+            top: -45px;
+            left: 16px;
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            border: 4px solid var(--color-twitter-black);
+            background-color: #333;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        article.profile-card > section.profile-details > figure.avatar-holder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Action block on the right (like follow button) */
+        article.profile-card > section.profile-details > menu.action-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+            height: 36px;
+            list-style: none;
+        }
+
+        article.profile-card > section.profile-details > menu.action-bar button.btn-follow {
+            background-color: var(--color-twitter-white);
+            color: var(--color-twitter-black);
+            border: none;
+            border-radius: 9999px;
+            padding: 0 16px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        article.profile-card > section.profile-details > menu.action-bar button.btn-follow:hover {
+            opacity: 0.9;
+        }
+
+        /* User Identity info */
+        article.profile-card > section.profile-details > header.identity-header {
+            margin-top: 16px;
+        }
+
+        article.profile-card > section.profile-details > header.identity-header h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--color-twitter-white);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Verified Badge SVG */
+        article.profile-card > section.profile-details > header.identity-header h2 svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--color-twitter-blue);
+        }
+
+        article.profile-card > section.profile-details > header.identity-header p.username {
+            font-size: 0.9rem;
+            color: var(--color-twitter-gray);
+        }
+
+        /* Biography description */
+        article.profile-card > section.profile-details > p.bio {
+            font-size: 0.92rem;
+            margin-top: 12px;
+            line-height: 1.4;
+            color: var(--color-twitter-white);
+        }
+
+        article.profile-card > section.profile-details > p.bio a {
+            color: var(--color-twitter-blue);
+            text-decoration: none;
+        }
+
+        article.profile-card > section.profile-details > p.bio a:hover {
+            text-decoration: underline;
+        }
+
+        /* Meta details: join date, website, location */
+        article.profile-card > section.profile-details > ul.meta-info {
+            list-style: none;
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--color-twitter-gray);
+        }
+
+        article.profile-card > section.profile-details > ul.meta-info li {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Statistics: Followers & Following counts */
+        article.profile-card > footer.stats-footer {
+            border-top: 1px solid var(--color-twitter-border);
+            padding: 12px 16px;
+            display: flex;
+            gap: 20px;
+            font-size: 0.88rem;
+        }
+
+        article.profile-card > footer.stats-footer a {
+            color: var(--color-twitter-gray);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        article.profile-card > footer.stats-footer a:hover {
+            text-decoration: underline;
+        }
+
+        article.profile-card > footer.stats-footer strong {
+            color: var(--color-twitter-white);
+            font-weight: 700;
+        }
+
+        /* Explainer tag */
+        .semantic-tag {
+            background-color: var(--color-twitter-dark-gray);
+            border: 1px solid var(--color-twitter-border);
+            font-size: 0.75rem;
+            font-family: monospace;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--color-twitter-blue);
+            margin-top: 16px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="exercise-title">
+        <h1>Exercise 11 — Twitter/X Profile Card</h1>
+        <p>Recreated using Semantic HTML5 and pure CSS without utility frameworks.</p>
+    </header>
+
+    <!-- Semantic Twitter/X Card (Article element) -->
+    <article class="profile-card">
+        <!-- Banner area as header -->
+        <header class="banner-area" aria-label="Profile banner background"></header>
+
+        <!-- Profile Details -->
+        <section class="profile-details">
+            <!-- Profile Avatar (No div wrapper, using picture/figure) -->
+            <figure class="avatar-holder">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&q=80" alt="Avatar image">
+            </figure>
+
+            <!-- Action list (toolbar menu) for following -->
+            <menu class="action-bar" type="toolbar">
+                <li><button class="btn-follow" type="button">Follow</button></li>
+            </menu>
+
+            <!-- Identity: Name & Handles -->
+            <header class="identity-header">
+                <h2>
+                    Liya Kebede
+                    <!-- Verified Badge SVG -->
+                    <svg viewBox="0 0 24 24" aria-label="Verified account">
+                        <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.99-3.818-3.99-.48 0-.94.1-1.348.27C14.825 2.515 13.512 1.5 12 1.5s-2.825 1.015-3.422 2.28c-.407-.17-.867-.27-1.348-.27-2.108 0-3.818 1.78-3.818 3.99 0 .495.084.965.238 1.4-1.273.65-2.148 2.02-2.148 3.6 0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.71 3.99 3.818 3.99.48 0 .94-.1 1.348-.27.597 1.265 1.91 2.28 3.422 2.28s2.825-1.015 3.422-2.28c.407.17.867.27 1.348.27 2.108 0 3.818-1.78 3.818-3.99 0-.495-.084-.965-.238-1.4 1.273-.65 2.148-2.02 2.148-3.6zm-12.72 3.32a.987.987 0 01-.707-.29l-2.47-2.47a.998.998 0 111.41-1.42l1.76 1.76 4.77-4.76a.999.999 0 111.41 1.41l-5.48 5.48a.987.987 0 01-.703.29z"/>
+                    </svg>
+                </h2>
+                <p class="username">@liya_kebede</p>
+            </header>
+
+            <!-- Biography description -->
+            <p class="bio">
+                Founder at <a href="#">@LiyaCreative</a> | Building tech solutions for East African startups. Empowering next-gen creators. 🚀 Addis Ababa, Ethiopia.
+            </p>
+
+            <!-- Metadata info -->
+            <ul class="meta-info">
+                <li>📍 Addis Ababa</li>
+                <li>🔗 <a href="#" style="color: var(--color-twitter-blue); text-decoration: none;">liyakebede.dev</a></li>
+                <li>📅 Joined June 2026</li>
+            </ul>
+        </section>
+
+        <!-- Stats Footer section -->
+        <footer class="stats-footer">
+            <a href="#"><strong>1,492</strong> Following</a>
+            <a href="#"><strong>10.8K</strong> Followers</a>
+        </footer>
+    </article>
+
+    <span class="semantic-tag">&lt;article&gt; based X Profile Card layout</span>
+
+</body>
+</html>
