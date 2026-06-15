@@ -35,25 +35,20 @@ let campaigns = [
     { title: "Electric Skateboard", raised: 4500, goal: 5000 }
 ];
 
-// Step 1: Use map to add a percentFunded field to each 
-let campaignsWithPercent = campaigns.map(function(camp) {
-    return {
-        title: camp.title,
-        raised: camp.raised,
-        goal: camp.goal,
-        percentFunded: (camp.raised / camp.goal) * 100
-    };
-});
-
-// Step 2: Filter to only campaigns that are >= 50% funded 
-let strongCampaigns = campaignsWithPercent.filter(function(camp) {
-    return camp.percentFunded >= 50;
-});
-
-// Step 3: Sort by percentFunded descending (highest to lowest) 
-strongCampaigns.sort(function(a, b) {
-    return b.percentFunded - a.percentFunded;
-});
+// Steps 1-3 chained: map (add percentFunded) → filter (>= 50%) → sort (descending)
+let topCampaigns = campaigns
+    .map(function(camp) {
+        return {
+            ...camp,
+            percentFunded: (camp.raised / camp.goal) * 100
+        };
+    })
+    .filter(function(camp) {
+        return camp.percentFunded >= 50;
+    })
+    .sort(function(a, b) {
+        return b.percentFunded - a.percentFunded;
+    });
 
 console.log("\n--- Top Performing Campaigns ---");
-console.log(strongCampaigns);
+console.log(topCampaigns);
