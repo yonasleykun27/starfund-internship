@@ -15,8 +15,26 @@ Focuses on transition to the markup/visual layer of StarFund using semantic tags
 
 ---
 
+## Day 12 — Flexbox (Completed)
+
+Focuses on one-dimensional layouts using CSS Flexbox, handling alignment, fluid scaling, space distribution, and responsive wrapping.
+
+### Files Included:
+
+*   **[day12.js](file:///c:/Users/Y/Desktop/starfund-internship/week3/day12.js)**: Comprehensive learning notes covering flex containers, flex items, axis alignment (`justify-content`, `align-items`), wrapping behavior (`flex-wrap`, `gap`), and item scaling (`flex-grow`, `flex-shrink`, `flex-basis`).
+*   **[browse-page.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/browse-page.html)**: Daily Assignment. StarFund Browse Page combining:
+    *   **Hero Section**: Built with flexbox (text details left, featured card graphic right), collapsing on mobile viewports.
+    *   **Filter Bar**: Category filters and search/sort controls aligned horizontally using a flexible row layout.
+    *   **Campaign Grid**: Multiple responsive cards structured in a flex-wrap container.
+    *   **Cards**: Stretched and aligned as vertical flex columns with `flex-grow: 1` utilized on the body element to push card footers uniformly to the bottom.
+*   **[exercise12.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/exercise12.html)**: Practical Exercise 12. A responsive 3-column blog layout built using CSS Flexbox. Features responsive scaling that fluidly wraps to 2 columns on tablets and collapses into a single column on mobile screens.
+
+---
+
 ## Technical Standards Applied
 1. **Zero Div Layouts**: Strictly avoided generic nested `<div>` wrappers inside component tasks. Built structure via native HTML5 roles.
-2. **Global box-sizing reset**: Configured `box-sizing: border-box` to ensure padding and border values are contained within the defined width and height.
-3. **Sticky Alignment**: Implemented sticky header using `position: fixed` along with `backdrop-filter: blur(12px)` for premium UI appearance.
-4. **Interactive States**: Added hover states (`transform: translateY`, shadow glow, link text color shifts) to all buttons, profile cards, and header items.
+2. **Modern Flexbox Layouts**: Avoided layout floats, position hacks, and fixed pixel grid widths. Used container flex layout, gaps, and responsive basis.
+3. **Global box-sizing reset**: Configured `box-sizing: border-box` to ensure padding and border values are contained within the defined width and height.
+4. **Sticky Alignment**: Implemented sticky header using `position: sticky` along with `backdrop-filter: blur(12px)` for premium UI appearance.
+5. **Interactive States**: Added hover states (`transform: translateY`, shadow glow, link text color shifts) to all buttons, profile cards, and header items.
+
