@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 13 — CSS-Only Tooltips | StarFund</title>
+    <meta name="description" content="Exercise 13: Pure CSS-only interactive tooltips with no JavaScript. Features multiple directions and smooth transitions.">
+    <style>
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        /* CSS Variables / Design Tokens */
+        :root {
+            --color-primary: #6c47ff;
+            --color-primary-light: #8b6bff;
+            --color-accent: #00d4aa;
+            --color-bg: #0f0d1a;
+            --color-card-bg: #1a1730;
+            --color-border: rgba(108, 71, 255, 0.2);
+            --color-text-primary: #f1eeff;
+            --color-text-secondary: #a09bcc;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset & Base Box Model */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header.exercise-header {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 48px;
+        }
+
+        header.exercise-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, var(--color-primary-light), var(--color-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header.exercise-header p {
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Tooltip Container & Demo Layout */
+        .demo-card {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .demo-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .demo-section h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 8px;
+            color: var(--color-primary-light);
+        }
+
+        .button-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        /* --------------------------------------------------
+           BUTTON STYLING
+           -------------------------------------------------- */
+        .btn-demo {
+            background-color: rgba(108, 71, 255, 0.1);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .btn-demo:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+
+        /* --------------------------------------------------
+           CSS-ONLY TOOLTIP SYSTEM
+           -------------------------------------------------- */
+        /* Base Tooltip Class */
+        [data-tooltip] {
+            position: relative; /* Anchor for tooltip positioning */
+        }
+
+        /* Tooltip Body */
+        [data-tooltip]::before {
+            content: attr(data-tooltip); /* Pull content from data-tooltip attribute */
+            position: absolute;
+            background-color: #0c0a17;
+            color: var(--color-text-primary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(108, 71, 255, 0.3);
+            pointer-events: none; /* Let clicks pass through */
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        /* Tooltip Arrow */
+        [data-tooltip]::after {
+            content: '';
+            position: absolute;
+            border: 6px solid transparent;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 100;
+        }
+
+        /* Hover & Focus States to trigger Tooltip */
+        [data-tooltip]:hover::before,
+        [data-tooltip]:hover::after,
+        [data-tooltip]:focus-within::before,
+        [data-tooltip]:focus-within::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* ──────────────────────────────────────────────────
+           TOOLTIP DIRECTIONS
+           ────────────────────────────────────────────────── */
+
+        /* 1. TOP (Default) */
+        [data-tooltip-dir="top"]::before {
+            bottom: 100%;
+            left: 50%;
+            transform: translate(-50%, -8px);
+        }
+
+        [data-tooltip-dir="top"]::after {
+            bottom: 100%;
+            left: 50%;
+            transform: translate(-50%, 4px);
+            border-top-color: #0c0a17;
+        }
+
+        /* Animations on hover for Top */
+        [data-tooltip-dir="top"]:hover::before {
+            transform: translate(-50%, -12px);
+        }
+        [data-tooltip-dir="top"]:hover::after {
+            transform: translate(-50%, 0px);
+        }
+
+        /* 2. BOTTOM */
+        [data-tooltip-dir="bottom"]::before {
+            top: 100%;
+            left: 50%;
+            transform: translate(-50%, 8px);
+        }
+
+        [data-tooltip-dir="bottom"]::after {
+            top: 100%;
+            left: 50%;
+            transform: translate(-50%, -4px);
+            border-bottom-color: #0c0a17;
+        }
+
+        /* Animations on hover for Bottom */
+        [data-tooltip-dir="bottom"]:hover::before {
+            transform: translate(-50%, 12px);
+        }
+        [data-tooltip-dir="bottom"]:hover::after {
+            transform: translate(-50%, 0px);
+        }
+
+        /* 3. LEFT */
+        [data-tooltip-dir="left"]::before {
+            right: 100%;
+            top: 50%;
+            transform: translate(-8px, -50%);
+        }
+
+        [data-tooltip-dir="left"]::after {
+            right: 100%;
+            top: 50%;
+            transform: translate(4px, -50%);
+            border-left-color: #0c0a17;
+        }
+
+        /* Animations on hover for Left */
+        [data-tooltip-dir="left"]:hover::before {
+            transform: translate(-12px, -50%);
+        }
+        [data-tooltip-dir="left"]:hover::after {
+            transform: translate(0px, -50%);
+        }
+
+        /* 4. RIGHT */
+        [data-tooltip-dir="right"]::before {
+            left: 100%;
+            top: 50%;
+            transform: translate(8px, -50%);
+        }
+
+        [data-tooltip-dir="right"]::after {
+            left: 100%;
+            top: 50%;
+            transform: translate(-4px, -50%);
+            border-right-color: #0c0a17;
+        }
+
+        /* Animations on hover for Right */
+        [data-tooltip-dir="right"]:hover::before {
+            transform: translate(12px, -50%);
+        }
+        [data-tooltip-dir="right"]:hover::after {
+            transform: translate(0px, -50%);
+        }
+
+        /* ──────────────────────────────────────────────────
+           GLOW/THEME TOOLTIPS (Bonus Visual Style)
+           ────────────────────────────────────────────────── */
+        .theme-tooltip[data-tooltip]::before {
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+            border: none;
+            font-weight: 600;
+        }
+        .theme-tooltip[data-tooltip-dir="top"]::after {
+            border-top-color: var(--color-primary);
+        }
+        .theme-tooltip[data-tooltip-dir="bottom"]::after {
+            border-bottom-color: var(--color-primary-light);
+        }
+
+        .accent-tooltip[data-tooltip]::before {
+            background: #00d4aa;
+            color: #0f0d1a;
+            font-weight: 700;
+        }
+        .accent-tooltip[data-tooltip-dir="top"]::after {
+            border-top-color: #00d4aa;
+        }
+        .accent-tooltip[data-tooltip-dir="bottom"]::after {
+            border-bottom-color: #00d4aa;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="exercise-header">
+        <h1>Exercise 13 — CSS Tooltips</h1>
+        <p>Interactive tooltips built using pure CSS. Uses the <code>data-tooltip</code> and <code>data-tooltip-dir</code> attributes to cleanly load and position labels without JavaScript.</p>
+    </header>
+
+    <main class="demo-card">
+        
+        <!-- Standard Positions -->
+        <section class="demo-section">
+            <h2>Directional Tooltips</h2>
+            <p style="color: var(--color-text-secondary); font-size: 0.9rem;">Hover over the buttons below to see tooltips transition smoothly in all four cardinal directions.</p>
+            <div class="button-grid">
+                <button class="btn-demo" data-tooltip="This is at the top!" data-tooltip-dir="top">Tooltip Top</button>
+                <button class="btn-demo" data-tooltip="This is at the bottom!" data-tooltip-dir="bottom">Tooltip Bottom</button>
+                <button class="btn-demo" data-tooltip="Look on the left!" data-tooltip-dir="left">Tooltip Left</button>
+                <button class="btn-demo" data-tooltip="Look on the right!" data-tooltip-dir="right">Tooltip Right</button>
+            </div>
+        </section>
+
+        <!-- Styled Tooltips -->
+        <section class="demo-section">
+            <h2>Styled & Branded Tooltips</h2>
+            <p style="color: var(--color-text-secondary); font-size: 0.9rem;">Using CSS gradients and brand color schemes to create premium card tooltips matching StarFund's design system.</p>
+            <div class="button-grid">
+                <button class="btn-demo theme-tooltip" data-tooltip="StarFund Premium Gradient Tooltip" data-tooltip-dir="top">Purple Gradient</button>
+                <button class="btn-demo accent-tooltip" data-tooltip="Glowing Teal High-Contrast Tooltip!" data-tooltip-dir="bottom">Glowing Teal</button>
+            </div>
+        </section>
+
+        <!-- Implementation Details -->
+        <section class="demo-section" style="background-color: rgba(255,255,255,0.02); padding: 24px; border-radius: 12px; border: 1px dashed var(--color-border);">
+            <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--color-text-primary);">How it Works:</h3>
+            <ul style="color: var(--color-text-secondary); font-size: 0.85rem; margin-left: 20px; display: flex; flex-direction: column; gap: 6px;">
+                <li><strong>HTML Attribute</strong>: Uses <code>data-tooltip="label content"</code> to hold the text content.</li>
+                <li><strong>CSS Content Retrieval</strong>: The pseudo-element uses <code>content: attr(data-tooltip)</code> to fetch the text value dynamically.</li>
+                <li><strong>Zero JavaScript</strong>: Toggle states are handled completely in the CSS compiler using the <code>:hover</code> and <code>:focus-within</code> selectors.</li>
+                <li><strong>Animations</strong>: Smooth cubic-bezier transitions animate the `opacity` and `transform` properties for a premium feel.</li>
+            </ul>
+        </section>
+
+    </main>
+
+</body>
+</html>
