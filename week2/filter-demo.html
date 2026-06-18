@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarFund | Startup Filter & Funding Demo</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- CSS Styles -->
+    <style>
+        /* ============================================================================
+           DESIGN SYSTEM & VARIABLES
+           ============================================================================ */
+        :root {
+            --bg-dark: #070a13;
+            --bg-card: rgba(15, 23, 42, 0.45);
+            --bg-modal: #0f162a;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-hover: rgba(129, 140, 248, 0.35);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            
+            --accent-primary: #818cf8; /* Indigo */
+            --accent-secondary: #34d399; /* Emerald */
+            --accent-danger: #ef4444; /* Red */
+            
+            --glow-indigo: rgba(99, 102, 241, 0.15);
+            --glow-emerald: rgba(52, 211, 153, 0.2);
+            
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============================================================================
+           RESET & GLOBAL STYLES
+           ============================================================================ */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(52, 211, 153, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ============================================================================
+           TYPOGRAPHY & HEADER
+           ============================================================================ */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-star {
+            color: var(--accent-secondary);
+            font-size: 1.75rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ============================================================================
+           CONTROLS SECTION (Search & Filter)
+           ============================================================================ */
+        .controls-wrapper {
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1 1 300px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 1.25rem;
+            height: 1.25rem;
+            pointer-events: none;
+            transition: var(--transition-smooth);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(7, 10, 19, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.75rem;
+            padding: 0.8rem 1rem 0.8rem 2.75rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition-smooth);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(129, 140, 248, 0.2);
+            background: rgba(7, 10, 19, 0.9);
+        }
+
+        .search-input:focus + .search-icon {
+            color: var(--accent-primary);
+        }
+
+        .filter-box {
+            flex: 0 1 200px;
+            min-width: 160px;
+        }
+
+        .filter-select {
+            width: 100%;
+            background: rgba(7, 10, 19, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.75rem;
+            padding: 0.8rem 1rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+
+        .filter-select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(129, 140, 248, 0.2);
+            background: rgba(7, 10, 19, 0.9);
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            font-weight: 500;
+            padding: 0.8rem 1.25rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border-color: var(--text-muted);
+        }
+
+        .results-stats {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: auto;
+            align-self: center;
+        }
+
+        /* ============================================================================
+           STARTUP CARDS GRID
+           ============================================================================ */
+        .startups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 2rem;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .startup-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.25rem;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .startup-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--glass-border-hover);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--glow-indigo);
+        }
+
+        /* Card Banner / Header Image */
+        .card-banner {
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            padding: 1rem;
+        }
+
+        .card-banner::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(7, 10, 19, 0.8));
+            z-index: 1;
+        }
+
+        .card-sector-badge {
+            position: relative;
+            z-index: 2;
+            background: rgba(7, 10, 19, 0.85);
+            border: 1px solid var(--glass-border);
+            color: var(--accent-secondary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Card Body */
+        .card-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            z-index: 2;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        /* Card Funding Progress */
+        .card-progress-wrapper {
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-percent {
+            font-weight: 700;
+            color: var(--accent-secondary);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Stats Row */
+        .card-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            border-top: 1px solid var(--glass-border);
+            padding-top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Card Action Button */
+        .fund-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            color: white;
+            border: none;
+            font-family: var(--font-body);
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 0.8rem;
+            width: 100%;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .fund-btn:hover {
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+
+        .fund-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ============================================================================
+           EMPTY STATE
+           ============================================================================ */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--bg-card);
+            border: 1px dashed var(--glass-border);
+            border-radius: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .empty-icon {
+            width: 3rem;
+            height: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 400px;
+        }
+
+        /* ============================================================================
+           MODAL DIALOG (Funding Form)
+           ============================================================================ */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(7, 10, 19, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition-smooth);
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background-color: var(--bg-modal);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.5rem;
+            width: 90%;
+            max-width: 480px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            transform: translateY(-40px) scale(0.95);
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        /* Modal Body */
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-startup-summary {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-details h4 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-details p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .summary-price {
+            text-align: right;
+        }
+
+        .summary-price .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.15rem;
+        }
+
+        .summary-price .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-secondary);
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-suffix {
+            position: absolute;
+            right: 1rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(7, 10, 19, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 0.75rem;
+            padding: 0.8rem 1rem;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            font-weight: 600;
+            outline: none;
+            transition: var(--transition-smooth);
+            padding-right: 4.5rem; /* Space for suffix */
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(129, 140, 248, 0.2);
+            background: rgba(7, 10, 19, 0.9);
+        }
+
+        /* Error States */
+        .error-message {
+            color: var(--accent-danger);
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .form-input.input-error {
+            border-color: var(--accent-danger);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+            animation: shake 0.4s ease;
+        }
+
+        /* Order Preview Pane */
+        .order-preview {
+            background: rgba(99, 102, 241, 0.03);
+            border: 1px dashed rgba(129, 140, 248, 0.2);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: var(--transition-smooth);
+        }
+
+        .order-preview.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .preview-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .preview-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background: linear-gradient(135deg, var(--accent-secondary), #10b981);
+            color: #070a13;
+            border: none;
+            font-family: var(--font-body);
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 1rem;
+            width: 100%;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);
+        }
+
+        .submit-btn:hover {
+            box-shadow: 0 6px 20px rgba(52, 211, 153, 0.4);
+            filter: brightness(1.1);
+            transform: scale(1.01);
+        }
+
+        .submit-btn:active {
+            transform: scale(0.99);
+        }
+
+        /* Success Panel */
+        .success-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-modal);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition-smooth);
+        }
+
+        .success-panel.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-checkmark {
+            width: 4.5rem;
+            height: 4.5rem;
+            background: rgba(52, 211, 153, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-secondary);
+            margin-bottom: 1.5rem;
+            border: 2px solid rgba(52, 211, 153, 0.2);
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .success-panel h3 {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .success-panel p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            max-width: 320px;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Canvas Particle overlay */
+        .confetti-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9;
+        }
+
+        /* ============================================================================
+           TOAST NOTIFICATION
+           ============================================================================ */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--glass-border-hover);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1100;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(8px);
+        }
+
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-icon {
+            color: var(--accent-secondary);
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .toast-content h5 {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .toast-content p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================================================
+           ANIMATIONS
+           ============================================================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.6); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* ============================================================================
+           RESPONSIVE DESIGN PREFERENCES
+           ============================================================================ */
+        @media (max-width: 768px) {
+            body {
+                padding: 1.5rem 0.75rem;
+            }
+            .controls-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-box, .reset-btn {
+                flex: 1 1 auto;
+            }
+            .results-stats {
+                margin-left: 0;
+                text-align: center;
+                padding-top: 0.5rem;
+            }
+            .startups-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-container {
+                max-width: 100%;
+                border-radius: 1.25rem 1.25rem 0 0;
+                margin-top: auto; /* Push to bottom on mobile */
+                transform: translateY(100px);
+            }
+            .modal-overlay.active .modal-container {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <span class="logo-star">★</span>
+                <span>StarFund</span>
+            </div>
+            <p>Empowering the next generation of founders. Browse active crowdfunding campaigns, filter key sectors, and make a simulated investment.</p>
+        </header>
+
+        <!-- Controls Section -->
+        <section class="controls-wrapper" aria-label="Filters">
+            <!-- Search Box -->
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Search startups by name..." aria-label="Search startups by name">
+                <!-- Search Icon SVG -->
+                <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+
+            <!-- Dropdown Filter Box -->
+            <div class="filter-box">
+                <select id="sector-filter" class="filter-select" aria-label="Filter by sector">
+                    <option value="all">All Sectors</option>
+                    <option value="Healthcare AI">Healthcare AI</option>
+                    <option value="Aerospace">Aerospace</option>
+                    <option value="Fintech">Fintech</option>
+                    <option value="Agriculture">Agriculture</option>
+                    <option value="Clean Energy">Clean Energy</option>
+                    <option value="Cybersecurity">Cybersecurity</option>
+                </select>
+            </div>
+
+            <!-- Reset Button -->
+            <button id="reset-btn" class="reset-btn" type="button">
+                <!-- Reset Icon -->
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18"/>
+                </svg>
+                Reset Filters
+            </button>
+
+            <!-- Results Stats -->
+            <div class="results-stats" id="results-stats">Showing all startups</div>
+        </section>
+
+        <!-- Startups Cards Grid -->
+        <main class="startups-grid" id="startups-grid">
+            <!-- Dynamic startup cards will be injected here by Javascript -->
+        </main>
+    </div>
+
+    <!-- Funding Modal Overlay -->
+    <div class="modal-overlay" id="funding-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-container">
+            
+            <!-- Confetti Canvas -->
+            <canvas id="confetti" class="confetti-canvas"></canvas>
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Fund Startup</h3>
+                <button class="close-btn" id="modal-close-btn" type="button" aria-label="Close modal">
+                    <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Modal Body (The Form) -->
+            <div class="modal-body">
+                <form id="funding-form" novalidate>
+                    <!-- Startup Summary Box -->
+                    <div class="modal-startup-summary">
+                        <div class="summary-details">
+                            <h4 id="modal-startup-name">Startup Name</h4>
+                            <p id="modal-startup-sector">Sector Description</p>
+                        </div>
+                        <div class="summary-price">
+                            <div class="label">Share Price</div>
+                            <div class="value" id="modal-share-price">$0</div>
+                        </div>
+                    </div>
+
+                    <!-- Input Fields -->
+                    <div class="form-group">
+                        <label for="funding-shares-input" class="form-label">Simulate Investment Shares</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="funding-shares-input" class="form-input" placeholder="0" min="1" step="1">
+                            <span class="input-suffix" id="modal-remaining-shares">/ 0 shares left</span>
+                        </div>
+                        <!-- Validation Error Message -->
+                        <div class="error-message" id="input-error-msg">
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span>Validation Error here</span>
+                        </div>
+                    </div>
+
+                    <!-- Order Preview -->
+                    <div class="order-preview" id="order-preview">
+                        <span class="preview-label">Estimated Funding Contribution</span>
+                        <span class="preview-value" id="order-total-preview">$0.00</span>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="submit-btn">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                        Confirm Simulated Funding
+                    </button>
+                </form>
+            </div>
+
+            <!-- Success Overlay Panel -->
+            <div class="success-panel" id="success-panel">
+                <div class="success-checkmark">
+                    <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
+                <h3>Funding Successful!</h3>
+                <p id="success-panel-message">Your simulated investment was processed successfully.</p>
+                <button class="submit-btn" id="success-close-btn" type="button">Close Window</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Toast Alert Notification -->
+    <div class="toast" id="toast-alert" role="alert" aria-live="polite">
+        <svg class="toast-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div class="toast-content">
+            <h5 id="toast-title">Success</h5>
+            <p id="toast-body">Simulation updated.</p>
+        </div>
+    </div>
+
+    <!-- JavaScript Execution Logic -->
+    <script>
+        // ==========================================
+        // STATE / MOCK DATA MODEL
+        // ==========================================
+        const startups = [
+            {
+                id: 1,
+                name: "HealthAI Diagnostics",
+                sector: "Healthcare AI",
+                description: "Revolutionizing patient care with real-time diagnostic AI models that analyze clinical scans in under 10 seconds.",
+                raised: 68500,
+                goal: 120000,
+                sharePrice: 10,
+                remainingShares: 5150,
+                bannerGradient: "linear-gradient(135deg, #3b82f6, #8b5cf6)"
+            },
+            {
+                id: 2,
+                name: "AeroDrones Systems",
+                sector: "Aerospace",
+                description: "Next-generation autonomous survey and transport cargo drones configured for rural medical deliveries.",
+                raised: 32000,
+                goal: 80000,
+                sharePrice: 20,
+                remainingShares: 2400,
+                bannerGradient: "linear-gradient(135deg, #f59e0b, #d97706)"
+            },
+            {
+                id: 3,
+                name: "FinTech Pro",
+                sector: "Fintech",
+                description: "Decentralized micro-finance protocols providing collateralized loans for emerging-market startups.",
+                raised: 145000,
+                goal: 150000,
+                sharePrice: 50,
+                remainingShares: 100,
+                bannerGradient: "linear-gradient(135deg, #10b981, #059669)"
+            },
+            {
+                id: 4,
+                name: "EcoHarvest Solutions",
+                sector: "Agriculture",
+                description: "Smarter hydroponic farming pods using IoT sensors to reduce commercial irrigation waste by 95%.",
+                raised: 45000,
+                goal: 95000,
+                sharePrice: 15,
+                remainingShares: 3333,
+                bannerGradient: "linear-gradient(135deg, #06b6d4, #0891b2)"
+            },
+            {
+                id: 5,
+                name: "SolarGrid Labs",
+                sector: "Clean Energy",
+                description: "Peer-to-peer neighborhood microgrids optimizing decentralized solar distribution networks.",
+                raised: 120000,
+                goal: 200000,
+                sharePrice: 25,
+                remainingShares: 3200,
+                bannerGradient: "linear-gradient(135deg, #ec4899, #be185d)"
+            },
+            {
+                id: 6,
+                name: "CyberShield AI",
+                sector: "Cybersecurity",
+                description: "Zero-trust network defense guards using reinforcement learning to deflect real-time server exploits.",
+                raised: 95000,
+                goal: 110000,
+                sharePrice: 50,
+                remainingShares: 300,
+                bannerGradient: "linear-gradient(135deg, #6366f1, #4f46e5)"
+            }
+        ];
+
+        // Active state context
+        let selectedStartupId = null;
+
+        // ==========================================
+        // DYNAMIC DOM RENDERING FUNCTIONS
+        // ==========================================
+        
+        /**
+         * Formats numeric strings to localized dollar currencies.
+         */
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        /**
+         * Renders startup cards grid based on provided filter scope.
+         */
+        function renderStartups(dataList) {
+            const gridContainer = document.getElementById("startups-grid");
+            const statsElement = document.getElementById("results-stats");
+            
+            // Clean grid
+            gridContainer.innerHTML = "";
+            
+            // Update stats counter text
+            if (dataList.length === 0) {
+                statsElement.textContent = "0 startups matching filters";
+                gridContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg class="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h3>No Startups Found</h3>
+                        <p>We couldn't find any campaigns that match your search query or selected sector. Try resetting your filter criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            statsElement.textContent = `Showing ${dataList.length} startup${dataList.length > 1 ? 's' : ''}`;
+
+            // Loop and build card elements
+            dataList.forEach(startup => {
+                const fundingPercent = Math.min(Math.round((startup.raised / startup.goal) * 100), 100);
+                
+                const card = document.createElement("article");
+                card.className = "startup-card";
+                card.setAttribute("data-id", startup.id);
+                
+                card.innerHTML = `
+                    <div class="card-banner" style="background: ${startup.bannerGradient}">
+                        <span class="card-sector-badge">${startup.sector}</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">${startup.name}</h3>
+                        <p class="card-description">${startup.description}</p>
+                        
+                        <!-- Progress info -->
+                        <div class="card-progress-wrapper">
+                            <div class="progress-label-row">
+                                <span class="progress-label">Funding Progress</span>
+                                <span class="progress-percent">${fundingPercent}%</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar-fill" style="width: ${fundingPercent}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Stats fields -->
+                        <div class="card-stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Total Raised</span>
+                                <span class="stat-value">${formatCurrency(startup.raised)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Funding Goal</span>
+                                <span class="stat-value">${formatCurrency(startup.goal)}</span>
+                            </div>
+                            <div class="stat-item" style="grid-column: span 2; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 0.5rem; margin-top: 0.25rem;">
+                                <span class="stat-label" style="display:inline; margin-right: 0.5rem;">Available Shares:</span>
+                                <span class="stat-value" style="display:inline; font-size: 0.85rem; color: var(--accent-secondary);">${startup.remainingShares.toLocaleString()} shares</span>
+                            </div>
+                        </div>
+
+                        <!-- Action button -->
+                        <button class="fund-btn" type="button" data-action-fund="${startup.id}">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                            </svg>
+                            Fund This Startup
+                        </button>
+                    </div>
+                `;
+
+                gridContainer.appendChild(card);
+            });
+
+            // Bind click handlers directly to "Fund This Startup" buttons (no onclick attributes)
+            const fundButtons = gridContainer.querySelectorAll('[data-action-fund]');
+            fundButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.currentTarget.getAttribute('data-action-fund'));
+                    openFundingModal(id);
+                });
+            });
+        }
+
+        // ==========================================
+        // FILTER & SEARCH LOGIC
+        // ==========================================
+        
+        /**
+         * Filters the master dataset based on inputs.
+         */
+        function filterAndSearch() {
+            const searchQuery = document.getElementById("search-input").value.toLowerCase().trim();
+            const sectorSelection = document.getElementById("sector-filter").value;
+
+            const filtered = startups.filter(startup => {
+                const matchesSearch = startup.name.toLowerCase().includes(searchQuery) ||
+                                      startup.description.toLowerCase().includes(searchQuery);
+                const matchesSector = (sectorSelection === "all") || (startup.sector === sectorSelection);
+                
+                return matchesSearch && matchesSector;
+            });
+
+            renderStartups(filtered);
+        }
+
+        /**
+         * Resets UI search filter fields to their initial states.
+         */
+        function resetFilters() {
+            document.getElementById("search-input").value = "";
+            document.getElementById("sector-filter").value = "all";
+            filterAndSearch();
+            showToast("Filters Reset", "Showing all active campaign listings.");
+        }
+
+        // ==========================================
+        // FUNDING MODAL CONTROLLERS & FORM VALIDATION
+        // ==========================================
+        
+        /**
+         * Opens the simulated investment form modal.
+         */
+        function openFundingModal(id) {
+            const startup = startups.find(item => item.id === id);
+            if (!startup) return;
+
+            selectedStartupId = id;
+            
+            // Populate modal fields
+            document.getElementById("modal-startup-name").textContent = startup.name;
+            document.getElementById("modal-startup-sector").textContent = startup.sector;
+            document.getElementById("modal-share-price").textContent = formatCurrency(startup.sharePrice);
+            document.getElementById("modal-remaining-shares").textContent = `/ ${startup.remainingShares.toLocaleString()} shares left`;
+            
+            // Reset form fields and clean errors
+            const formInput = document.getElementById("funding-shares-input");
+            formInput.value = "";
+            formInput.classList.remove("input-error");
+            formInput.max = startup.remainingShares;
+            
+            document.getElementById("input-error-msg").style.display = "none";
+            document.getElementById("order-preview").classList.remove("visible");
+            document.getElementById("success-panel").classList.remove("active");
+
+            // Open overlay
+            document.getElementById("funding-modal-overlay").classList.add("active");
+            formInput.focus();
+        }
+
+        /**
+         * Closes investment modal and clears context.
+         */
+        function closeFundingModal() {
+            document.getElementById("funding-modal-overlay").classList.remove("active");
+            selectedStartupId = null;
+            
+            // Cancel confetti animation loop if running
+            if (confettiAnimId) {
+                cancelAnimationFrame(confettiAnimId);
+                confettiAnimId = null;
+            }
+        }
+
+        /**
+         * Validates the investment amount in real-time.
+         * Returns validation object: { isValid: boolean, errorText: string }
+         */
+        function validateAmount(valueInt, remainingShares) {
+            if (isNaN(valueInt) || valueInt === null || valueInt === undefined || valueInt === "") {
+                return { isValid: false, errorText: "Please enter a valid share amount." };
+            }
+            if (!Number.isInteger(Number(valueInt))) {
+                return { isValid: false, errorText: "Shares purchased must be a whole number." };
+            }
+            if (valueInt <= 0) {
+                return { isValid: false, errorText: "Simulated investment must be at least 1 share." };
+            }
+            if (valueInt > remainingShares) {
+                return { isValid: false, errorText: `Amount exceeds available shares (${remainingShares.toLocaleString()} remaining).` };
+            }
+            return { isValid: true, errorText: "" };
+        }
+
+        /**
+         * Calculates cost and shows/hides preview panel.
+         */
+        function handleInputFeedback() {
+            const inputVal = document.getElementById("funding-shares-input").value;
+            const previewEl = document.getElementById("order-preview");
+            const errorMsgEl = document.getElementById("input-error-msg");
+            const inputEl = document.getElementById("funding-shares-input");
+            
+            if (!selectedStartupId) return;
+            const startup = startups.find(item => item.id === selectedStartupId);
+            
+            const valueInt = inputVal ? parseFloat(inputVal) : NaN;
+            
+            // Always remove error class on change to let user correct it
+            inputEl.classList.remove("input-error");
+            errorMsgEl.style.display = "none";
+
+            const validation = validateAmount(valueInt, startup.remainingShares);
+            
+            if (validation.isValid) {
+                const totalCost = valueInt * startup.sharePrice;
+                document.getElementById("order-total-preview").textContent = formatCurrency(totalCost);
+                previewEl.classList.add("visible");
+            } else {
+                previewEl.classList.remove("visible");
+            }
+        }
+
+        /**
+         * Submits investment form with preventDefault and updates database state.
+         */
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            if (!selectedStartupId) return;
+            const startup = startups.find(item => item.id === selectedStartupId);
+            
+            const inputEl = document.getElementById("funding-shares-input");
+            const errorMsgEl = document.getElementById("input-error-msg");
+            
+            const valueInt = parseInt(inputEl.value);
+            
+            // Run validation
+            const validation = validateAmount(valueInt, startup.remainingShares);
+            
+            if (!validation.isValid) {
+                // Display error states
+                inputEl.classList.add("input-error");
+                errorMsgEl.querySelector("span").textContent = validation.errorText;
+                errorMsgEl.style.display = "flex";
+                
+                // Remove animation class after shake completes to allow repeated shakes
+                setTimeout(() => {
+                    inputEl.classList.remove("input-error");
+                }, 400);
+                return;
+            }
+
+            // Calculation and State updates
+            const fundingGained = valueInt * startup.sharePrice;
+            startup.remainingShares -= valueInt;
+            startup.raised += fundingGained;
+
+            // Trigger canvas particle burst
+            initConfetti();
+
+            // Set success panel text content
+            document.getElementById("success-panel-message").textContent = 
+                `You successfully simulated an investment of ${valueInt.toLocaleString()} share${valueInt > 1 ? 's' : ''} in ${startup.name}, raising ${formatCurrency(fundingGained)}!`;
+            
+            // Toggle panel displays
+            document.getElementById("success-panel").classList.add("active");
+            
+            // Render main grid cards with fresh numbers
+            filterAndSearch();
+
+            // Show temporary toast message
+            showToast("Investment Confirmed", `Funded ${formatCurrency(fundingGained)} to ${startup.name}`);
+        }
+
+        // ==========================================
+        // TOAST NOTIFICATION UTILITY
+        // ==========================================
+        let toastTimeout = null;
+        function showToast(title, body) {
+            const toast = document.getElementById("toast-alert");
+            document.getElementById("toast-title").textContent = title;
+            document.getElementById("toast-body").textContent = body;
+            
+            toast.classList.add("active");
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove("active");
+            }, 3500);
+        }
+
+        // ==========================================
+        // CANVA PARTICLE CONFETTI EFFECT
+        // ==========================================
+        const canvas = document.getElementById("confetti");
+        const ctx = canvas.getContext("2d");
+        let particles = [];
+        let confettiAnimId = null;
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height / 2 + 50;
+                this.radius = Math.random() * 4 + 2;
+                this.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+                
+                // Exploding velocity vectors
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 7 + 3;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed - 2; // Bias upwards
+                
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.01;
+                this.gravity = 0.12;
+            }
+
+            update() {
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach((p, index) => {
+                p.update();
+                p.draw();
+                if (p.alpha <= 0) {
+                    particles.splice(index, 1);
+                }
+            });
+
+            if (particles.length > 0) {
+                confettiAnimId = requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        function initConfetti() {
+            resizeCanvas();
+            particles = [];
+            for (let i = 0; i < 150; i++) {
+                particles.push(new Particle());
+            }
+            if (confettiAnimId) cancelAnimationFrame(confettiAnimId);
+            animateConfetti();
+        }
+
+        // ==========================================
+        // ATTACH EVENT LISTENERS (Review Checklist compliance)
+        // ==========================================
+        document.addEventListener("DOMContentLoaded", () => {
+            // Render initial list
+            renderStartups(startups);
+
+            // Real-time search inputs hook (input event listener)
+            document.getElementById("search-input").addEventListener("input", filterAndSearch);
+            
+            // Dropdown change filter hook (change event listener)
+            document.getElementById("sector-filter").addEventListener("change", filterAndSearch);
+
+            // Reset filters hook
+            document.getElementById("reset-btn").addEventListener("click", resetFilters);
+
+            // Modal closure hooks
+            document.getElementById("modal-close-btn").addEventListener("click", closeFundingModal);
+            document.getElementById("success-close-btn").addEventListener("click", closeFundingModal);
+            
+            // Close modal when clicking on the backdrop overlay
+            document.getElementById("funding-modal-overlay").addEventListener("click", (e) => {
+                if (e.target === document.getElementById("funding-modal-overlay")) {
+                    closeFundingModal();
+                }
+            });
+
+            // Form dynamic validation feedback on key input
+            document.getElementById("funding-shares-input").addEventListener("input", handleInputFeedback);
+
+            // Submit funding transaction hook (preventDefault checklist compliant)
+            document.getElementById("funding-form").addEventListener("submit", handleFormSubmit);
+
+            // Canvas resize hook
+            window.addEventListener("resize", () => {
+                if (selectedStartupId) resizeCanvas();
+            });
+        });
+    </script>
+</body>
+</html>
