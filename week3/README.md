@@ -50,6 +50,21 @@ Focuses on two-dimensional layouts using CSS Grid, responsive design principles,
 
 ---
 
+## Day 14 — TailwindCSS (Completed)
+
+Focuses on utility-first CSS design, responsive prefixes, custom brand configurations, and building complex layouts entirely in Tailwind CSS without writing custom stylesheets.
+
+### Files Included:
+
+*   **[day14.js](file:///c:/Users/Y/Desktop/starfund-internship/week3/day14.js)**: Detailed learning notes, syntax explanation, and quick reference guide covering Tailwind utility classes, responsive design, Play CDN configurations, and mobile-first prefixes.
+*   **[exercise14.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/exercise14.html)**: Practical Exercise 14. An interactive, premium animated progress bar showcase page using CSS transitions, sliding stripe keyframes, and circular SVG rings driven by live adjustment controls.
+*   **[starfund-tailwind-demo.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/starfund-tailwind-demo.html)**: Daily Assignment & Tasks. A cohesive, high-end dashboard page containing:
+    *   **Header Navigation**: Rebuilt in Tailwind with full mobile responsiveness (collapsing hamburger menu drawer).
+    *   **Campaign Cards**: Rebuilt entirely in Tailwind showcasing modern grid spacing, hover translations, and gradient fills.
+    *   **Badge Components**: Status indicators (`Pending`, `Active`, `Funded`, `Closed`) styled dynamically in Tailwind.
+
+---
+
 ## Technical Standards Applied
 1. **Zero Div Layouts**: Strictly avoided generic nested `<div>` wrappers inside component tasks. Built structure via native HTML5 roles.
 2. **Two-Dimensional Grid Layouts**: Replaced flex rows and floats with native CSS Grid for complex grids (e.g. Founder Dashboard, Campaigns Grid).
@@ -58,5 +73,7 @@ Focuses on two-dimensional layouts using CSS Grid, responsive design principles,
 5. **Sticky Alignment**: Implemented sticky header using `position: sticky` along with `backdrop-filter: blur(12px)` for premium UI appearance.
 6. **Pure CSS Interactivity**: Leveraged pseudo-elements (`::before`/`::after`) and attribute selectors to build interactive tooltips with zero JS performance overhead.
 7. **Interactive States**: Added hover states (`transform: translateY`, shadow glow, link text color shifts) to all buttons, dashboard items, and cards.
+8. **Utility-First Design**: Implemented complete layouts using only Tailwind CSS utility classes, extending custom brand color schemes through Tailwind configuration scripts.
+
 
 

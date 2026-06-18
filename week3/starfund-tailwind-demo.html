@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 14 Assignment — TailwindCSS Showcase | StarFund</title>
+    <meta name="description" content="Day 14 Assignment: StarFund responsive header, campaign card, and badges rebuilt entirely using Tailwind CSS utility classes.">
+    
+    <!-- Import Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- StarFund Brand Config Extension -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            bg: '#0f0d1a',
+                            card: '#1a1730',
+                            primary: '#6c47ff',
+                            'primary-light': '#8b6bff',
+                            accent: '#00d4aa',
+                            border: 'rgba(108, 71, 255, 0.2)',
+                            'text-primary': '#f1eeff',
+                            'text-secondary': '#a09bcc',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-bg text-brand-text-primary font-sans min-h-screen flex flex-col">
+
+    <!-- ============================================================
+         HEADER COMPONENT (Daily Assignment - Tailwind Responsive)
+         ============================================================ -->
+    <header class="sticky top-0 z-50 bg-brand-bg/80 backdrop-blur-md border-b border-brand-border/40">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-primary to-brand-accent flex items-center justify-center shadow-lg shadow-brand-primary/20 group-hover:scale-105 transition duration-300">
+                    <span class="text-white font-extrabold text-xl">S</span>
+                </div>
+                <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-brand-text-primary to-brand-primary-light bg-clip-text text-transparent group-hover:text-brand-accent transition duration-300">
+                    Star<span class="text-brand-accent">Fund</span>
+                </span>
+            </a>
+
+            <!-- Desktop Navigation Menu -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-sm transition duration-200">Browse Projects</a>
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-sm transition duration-200">How It Works</a>
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-sm transition duration-200">Founder Portal</a>
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-sm transition duration-200">Leaderboard</a>
+            </nav>
+
+            <!-- Desktop Auth Controls -->
+            <div class="hidden md:flex items-center gap-4">
+                <a href="#" class="text-brand-text-primary hover:text-brand-accent text-sm font-semibold px-4 py-2 transition duration-200">Log In</a>
+                <a href="#" class="bg-brand-primary hover:bg-brand-primary-light text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition duration-300 shadow-md shadow-brand-primary/20 hover:shadow-lg hover:shadow-brand-primary/30 hover:-translate-y-0.5">
+                    Start Campaign
+                </a>
+            </div>
+
+            <!-- Mobile Hamburger Menu Button -->
+            <button id="menu-btn" class="md:hidden p-2 text-brand-text-primary hover:text-brand-accent focus:outline-none transition duration-200" aria-label="Toggle Navigation Menu">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Drawer Menu (Hidden by default, toggled via JS) -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-brand-border/30 bg-brand-bg/95 backdrop-blur-lg px-6 py-6 flex flex-col gap-6 absolute left-0 right-0 shadow-2xl">
+            <nav class="flex flex-col gap-4">
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-base transition py-1">Browse Projects</a>
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-base transition py-1">How It Works</a>
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-base transition py-1">Founder Portal</a>
+                <a href="#" class="text-brand-text-secondary hover:text-brand-accent font-medium text-base transition py-1">Leaderboard</a>
+            </nav>
+            <div class="border-t border-brand-border/30 pt-4 flex flex-col gap-3">
+                <a href="#" class="text-center text-brand-text-primary hover:text-brand-accent font-semibold py-2 transition">Log In</a>
+                <a href="#" class="text-center bg-brand-primary hover:bg-brand-primary-light text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-brand-primary/10">
+                    Start Campaign
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================
+         MAIN CONTAINER
+         ============================================================ -->
+    <main class="flex-grow max-w-7xl mx-auto px-6 py-12 w-full flex flex-col gap-12">
+        
+        <!-- Header Introduction -->
+        <section class="text-center max-w-3xl mx-auto flex flex-col gap-4">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-brand-text-primary via-brand-primary-light to-brand-accent bg-clip-text text-transparent">
+                Tailwind CSS Component Showcase
+            </h1>
+            <p class="text-brand-text-secondary text-base md:text-lg">
+                Delivered in pure, responsive Tailwind CSS utility classes. Contains the reconstructed responsive navigation header, status badges, and campaign cards.
+            </p>
+        </section>
+
+        <!-- Showcase Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <!-- LEFT & MIDDLE COLUMN: Campaign Cards (Task 1 Rebuild) -->
+            <section class="lg:col-span-2 flex flex-col gap-8">
+                
+                <div class="flex items-center justify-between border-b border-brand-border/20 pb-4">
+                    <h2 class="text-xl font-bold text-brand-primary-light flex items-center gap-2">
+                        <span>🚀 Campaign Card Rebuild</span>
+                        <span class="text-xs bg-brand-primary/10 text-brand-primary px-3 py-1 rounded-full border border-brand-border/20 font-semibold">Tailwind-Only</span>
+                    </h2>
+                    <span class="text-xs text-brand-text-secondary">Responsive Card Grid</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- CAMPAIGN CARD 1 (Funded State) -->
+                    <article class="bg-brand-card border border-brand-border/30 rounded-2xl overflow-hidden flex flex-col hover:border-brand-primary/50 hover:shadow-xl hover:shadow-brand-primary/5 hover:-translate-y-1.5 transition duration-300 group">
+                        <!-- Image banner with overlay -->
+                        <div class="relative h-48 w-full bg-gradient-to-tr from-indigo-950 to-slate-950 overflow-hidden">
+                            <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(108,71,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(108,71,255,0.05)_1px,transparent_1px)] bg-[size:14px_24px]"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-brand-card to-transparent opacity-80"></div>
+                            
+                            <!-- Status Badge (Task 2 Component) -->
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-teal-500/10 text-brand-accent border border-teal-500/30 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm shadow-teal-500/10">
+                                    Funded
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-6 flex-grow flex flex-col gap-4">
+                            <div>
+                                <span class="text-brand-accent text-xs font-semibold tracking-wider uppercase">Web3 & Finance</span>
+                                <h3 class="text-lg font-bold text-brand-text-primary group-hover:text-brand-accent transition duration-200 mt-1">
+                                    AuraPay: Decentralized Micropayments
+                                </h3>
+                                <p class="text-brand-text-secondary text-sm line-clamp-2 mt-2">
+                                    Building a lightning-fast layer 2 API allowing content platforms to charge sub-cent subscription fees globally.
+                                </p>
+                            </div>
+
+                            <!-- Progress Section -->
+                            <div class="flex flex-col gap-2 mt-2">
+                                <div class="flex justify-between text-xs font-semibold">
+                                    <span class="text-brand-text-secondary">Progress</span>
+                                    <span class="text-brand-accent font-bold">115%</span>
+                                </div>
+                                <div class="h-2 w-full bg-brand-bg rounded-full overflow-hidden border border-brand-border/10">
+                                    <div class="h-full bg-gradient-to-r from-brand-primary to-brand-accent rounded-full" style="width: 100%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Metrics Row -->
+                            <div class="grid grid-cols-3 gap-2 border-t border-brand-border/20 pt-4 text-center mt-2">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-brand-text-primary">$57,500</span>
+                                    <span class="text-[10px] text-brand-text-secondary uppercase font-semibold">Raised</span>
+                                </div>
+                                <div class="flex flex-col border-x border-brand-border/20">
+                                    <span class="text-sm font-bold text-brand-text-primary">342</span>
+                                    <span class="text-[10px] text-brand-text-secondary uppercase font-semibold">Backers</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-brand-accent">Finished</span>
+                                    <span class="text-[10px] text-brand-text-secondary uppercase font-semibold">Status</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Footer -->
+                        <div class="px-6 pb-6 mt-auto">
+                            <button class="w-full bg-brand-primary/10 hover:bg-brand-primary border border-brand-border/30 hover:border-brand-primary text-brand-text-primary hover:text-white font-bold py-3 px-4 rounded-xl transition duration-300">
+                                View Campaign Details
+                            </button>
+                        </div>
+                    </article>
+
+                    <!-- CAMPAIGN CARD 2 (Active State) -->
+                    <article class="bg-brand-card border border-brand-border/30 rounded-2xl overflow-hidden flex flex-col hover:border-brand-primary/50 hover:shadow-xl hover:shadow-brand-primary/5 hover:-translate-y-1.5 transition duration-300 group">
+                        <!-- Image banner with overlay -->
+                        <div class="relative h-48 w-full bg-gradient-to-tr from-violet-950 to-emerald-950 overflow-hidden">
+                            <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(108,71,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(108,71,255,0.05)_1px,transparent_1px)] bg-[size:14px_24px]"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-brand-card to-transparent opacity-80"></div>
+                            
+                            <!-- Status Badge (Task 2 Component) -->
+                            <div class="absolute top-4 right-4">
+                                <span class="bg-green-500/10 text-green-400 border border-green-500/30 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm shadow-green-500/10">
+                                    Active
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-6 flex-grow flex flex-col gap-4">
+                            <div>
+                                <span class="text-brand-accent text-xs font-semibold tracking-wider uppercase">HealthTech & AI</span>
+                                <h3 class="text-lg font-bold text-brand-text-primary group-hover:text-brand-accent transition duration-200 mt-1">
+                                    SanoAI: Early Tumor Detection
+                                </h3>
+                                <p class="text-brand-text-secondary text-sm line-clamp-2 mt-2">
+                                    Developing a localized computer-vision software that helps rural clinics diagnose chest scans with 98% accuracy.
+                                </p>
+                            </div>
+
+                            <!-- Progress Section -->
+                            <div class="flex flex-col gap-2 mt-2">
+                                <div class="flex justify-between text-xs font-semibold">
+                                    <span class="text-brand-text-secondary">Progress</span>
+                                    <span class="text-brand-accent font-bold">65%</span>
+                                </div>
+                                <div class="h-2 w-full bg-brand-bg rounded-full overflow-hidden border border-brand-border/10">
+                                    <div class="h-full bg-gradient-to-r from-brand-primary to-brand-accent rounded-full" style="width: 65%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Metrics Row -->
+                            <div class="grid grid-cols-3 gap-2 border-t border-brand-border/20 pt-4 text-center mt-2">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-brand-text-primary">$32,500</span>
+                                    <span class="text-[10px] text-brand-text-secondary uppercase font-semibold">Raised</span>
+                                </div>
+                                <div class="flex flex-col border-x border-brand-border/20">
+                                    <span class="text-sm font-bold text-brand-text-primary">189</span>
+                                    <span class="text-[10px] text-brand-text-secondary uppercase font-semibold">Backers</span>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-brand-text-primary">14 Days</span>
+                                    <span class="text-[10px] text-brand-text-secondary uppercase font-semibold">Left</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Footer -->
+                        <div class="px-6 pb-6 mt-auto">
+                            <button class="w-full bg-brand-primary/10 hover:bg-brand-primary border border-brand-border/30 hover:border-brand-primary text-brand-text-primary hover:text-white font-bold py-3 px-4 rounded-xl transition duration-300">
+                                View Campaign Details
+                            </button>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: Badge Component Library (Task 2) -->
+            <section class="flex flex-col gap-8">
+                
+                <div class="flex items-center justify-between border-b border-brand-border/20 pb-4">
+                    <h2 class="text-xl font-bold text-brand-primary-light">
+                        🏷️ Badge Library
+                    </h2>
+                    <span class="text-xs text-brand-text-secondary">Task 2 Component</span>
+                </div>
+
+                <div class="bg-brand-card border border-brand-border/30 rounded-2xl p-6 flex flex-col gap-6 shadow-xl">
+                    <p class="text-brand-text-secondary text-xs leading-relaxed">
+                        These indicator badges represent a project's state in our database. Created using only Tailwind utilities:
+                    </p>
+
+                    <!-- Pending Badge -->
+                    <div class="flex items-center justify-between bg-brand-bg/50 p-4 rounded-xl border border-brand-border/10">
+                        <span class="text-sm font-medium">Under Review:</span>
+                        <span class="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            Pending
+                        </span>
+                    </div>
+
+                    <!-- Active Badge -->
+                    <div class="flex items-center justify-between bg-brand-bg/50 p-4 rounded-xl border border-brand-border/10">
+                        <span class="text-sm font-medium">Funding Live:</span>
+                        <span class="bg-green-500/10 text-green-400 border border-green-500/20 text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            Active
+                        </span>
+                    </div>
+
+                    <!-- Funded Badge -->
+                    <div class="flex items-center justify-between bg-brand-bg/50 p-4 rounded-xl border border-brand-border/10">
+                        <span class="text-sm font-medium">Goal Met:</span>
+                        <span class="bg-teal-500/10 text-brand-accent border border-teal-500/20 text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            Funded
+                        </span>
+                    </div>
+
+                    <!-- Closed/Expired Badge -->
+                    <div class="flex items-center justify-between bg-brand-bg/50 p-4 rounded-xl border border-brand-border/10">
+                        <span class="text-sm font-medium">Campaign Over:</span>
+                        <span class="bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-extrabold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                            Closed
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Technical Review Checklist Info Box -->
+                <div class="bg-brand-card/30 border border-dashed border-brand-border/40 rounded-2xl p-6 flex flex-col gap-3">
+                    <h3 class="text-sm font-bold text-brand-text-primary">Tailwind Best Practices Applied:</h3>
+                    <ul class="text-xs text-brand-text-secondary flex flex-col gap-2 list-disc pl-4">
+                        <li><strong>No Custom Style Sheets</strong>: 100% of sizing, layout, corners, and fonts are built via classes.</li>
+                        <li><strong>Mobile-First Header</strong>: The navigation menu collapses into a hamburger icon under 768px (<code>hidden md:flex</code>) and renders a responsive overlay menu on click.</li>
+                        <li><strong>Hover Transformations</strong>: Hover transitions utilize <code>transition duration-300 hover:-translate-y-1.5</code> for organic visual scaling.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="border-t border-brand-border/20 py-8 text-center text-xs text-brand-text-secondary mt-auto">
+        StarFund Internship — Week 3, Day 14 Assignment. All rights reserved.
+    </footer>
+
+    <!-- Mobile Drawer JavaScript Toggle -->
+    <script>
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close menu when resizing beyond mobile size
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
