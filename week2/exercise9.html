@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="StarFund Internship - Exercise 9: Premium Form Client-Side Validation.">
+    <title>Exercise 9: Form Client-Side Validation</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 550px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        /* Validation UI States */
+        .form-group input.touched-valid {
+            border-color: rgba(16, 185, 129, 0.4);
+            background-color: rgba(16, 185, 129, 0.01);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.03);
+        }
+
+        .form-group input.touched-invalid {
+            border-color: rgba(239, 68, 68, 0.4);
+            background-color: rgba(239, 68, 68, 0.01);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.03);
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .validation-msg {
+            font-size: 0.78rem;
+            margin-top: 0.4rem;
+            min-height: 16px;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            opacity: 0;
+            transform: translateY(-2px);
+            transition: all 0.2s ease;
+        }
+
+        .validation-msg.show-error {
+            color: var(--accent-danger);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .validation-msg.show-valid {
+            color: var(--accent-success);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Submit Button */
+        button.btn-submit {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #2563eb 100%);
+            color: white;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s ease;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button.btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        button.btn-submit:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Success Modal Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--accent-success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .modal h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-list {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: left;
+            margin-bottom: 1.75rem;
+            font-size: 0.85rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+
+        .summary-item:last-child {
+            margin-bottom: 0;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+        }
+
+        .summary-item span.label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .summary-item span.val {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        button.btn-close {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-family: inherit;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button.btn-close:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 2px solid white;
+            width: 16px;
+            height: 16px;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .back-nav {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-nav:hover {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Register Campaign</h1>
+        <p class="subtitle">Complete the fields below to list your project on StarFund. Client-side checks will validate inputs in real-time.</p>
+
+        <form id="campaignForm" novalidate>
+            <!-- Field 1: Full Name -->
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <div class="input-wrapper">
+                    <input type="text" id="fullName" placeholder="e.g. John Doe" required>
+                </div>
+                <div class="validation-msg" id="fullNameMsg"></div>
+            </div>
+
+            <!-- Field 2: Email Address -->
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <div class="input-wrapper">
+                    <input type="email" id="email" placeholder="e.g. john@company.com" required>
+                </div>
+                <div class="validation-msg" id="emailMsg"></div>
+            </div>
+
+            <!-- Field 3: Password -->
+            <div class="form-group">
+                <label for="password">Campaign Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" placeholder="Min. 8 chars, 1 letter, 1 number, 1 special" required>
+                </div>
+                <div class="validation-msg" id="passwordMsg"></div>
+            </div>
+
+            <!-- Field 4: Campaign Title -->
+            <div class="form-group">
+                <label for="campaignTitle">Campaign Title</label>
+                <div class="input-wrapper">
+                    <input type="text" id="campaignTitle" placeholder="e.g. EcoGrid Power Grid" required>
+                </div>
+                <div class="validation-msg" id="campaignTitleMsg"></div>
+            </div>
+
+            <!-- Field 5: Funding Goal -->
+            <div class="form-group">
+                <label for="fundingGoal">Funding Goal (USD)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="fundingGoal" placeholder="Min. 1,000" min="1000" required>
+                </div>
+                <div class="validation-msg" id="fundingGoalMsg"></div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn" disabled>
+                <span class="spinner" id="btnSpinner"></span>
+                <span id="btnText">Submit Registration</span>
+            </button>
+        </form>
+
+        <div style="text-align: center;">
+            <a href="day10-landing.html" class="back-nav">← Back to Week 2 Overview</a>
+        </div>
+    </div>
+
+    <!-- Modal Success Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="success-icon">✓</div>
+            <h2>Campaign Registered!</h2>
+            <p>Your campaign details have passed client-side validation and were mock-saved.</p>
+            
+            <div class="summary-list">
+                <div class="summary-item">
+                    <span class="label">Founder:</span>
+                    <span class="val" id="sumFounder">John Doe</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Email:</span>
+                    <span class="val" id="sumEmail">john@company.com</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Campaign:</span>
+                    <span class="val" id="sumTitle">EcoGrid Power</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Goal:</span>
+                    <span class="val" id="sumGoal">$1,000</span>
+                </div>
+            </div>
+
+            <button class="btn-close" id="modalCloseBtn">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const form = document.getElementById('campaignForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const btnText = document.getElementById('btnText');
+        
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        
+        // Form Inputs & Messages
+        const fields = {
+            fullName: {
+                input: document.getElementById('fullName'),
+                msg: document.getElementById('fullNameMsg'),
+                validate: (val) => {
+                    if (val.trim() === '') return { isValid: false, err: 'Full Name is required.' };
+                    if (val.trim().length < 3) return { isValid: false, err: 'Must be at least 3 characters.' };
+                    if (!/^[a-zA-Z\s]+$/.test(val.trim())) return { isValid: false, err: 'Only letters and spaces allowed.' };
+                    return { isValid: true, success: 'Looks good!' };
+                }
+            },
+            email: {
+                input: document.getElementById('email'),
+                msg: document.getElementById('emailMsg'),
+                validate: (val) => {
+                    if (val.trim() === '') return { isValid: false, err: 'Email Address is required.' };
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(val.trim())) return { isValid: false, err: 'Enter a valid email format.' };
+                    return { isValid: true, success: 'Valid email format!' };
+                }
+            },
+            password: {
+                input: document.getElementById('password'),
+                msg: document.getElementById('passwordMsg'),
+                validate: (val) => {
+                    if (val === '') return { isValid: false, err: 'Password is required.' };
+                    if (val.length < 8) return { isValid: false, err: 'Password must be at least 8 characters.' };
+                    const hasLetter = /[a-zA-Z]/.test(val);
+                    const hasNumber = /[0-9]/.test(val);
+                    const hasSpecial = /[^a-zA-Z0-9]/.test(val);
+                    if (!hasLetter || !hasNumber || !hasSpecial) {
+                        return { isValid: false, err: 'Needs letters, numbers, & special chars.' };
+                    }
+                    return { isValid: true, success: 'Secure password!' };
+                }
+            },
+            campaignTitle: {
+                input: document.getElementById('campaignTitle'),
+                msg: document.getElementById('campaignTitleMsg'),
+                validate: (val) => {
+                    if (val.trim() === '') return { isValid: false, err: 'Campaign Title is required.' };
+                    if (val.trim().length < 5) return { isValid: false, err: 'Must be at least 5 characters.' };
+                    return { isValid: true, success: 'Awesome title!' };
+                }
+            },
+            fundingGoal: {
+                input: document.getElementById('fundingGoal'),
+                msg: document.getElementById('fundingGoalMsg'),
+                validate: (val) => {
+                    if (val === '') return { isValid: false, err: 'Funding Goal is required.' };
+                    const num = Number(val);
+                    if (isNaN(num)) return { isValid: false, err: 'Must be a numeric value.' };
+                    if (num < 1000) return { isValid: false, err: 'Goal must be at least $1,000.' };
+                    return { isValid: true, success: 'Goal accepted!' };
+                }
+            }
+        };
+
+        // Summary Fields
+        const sumFounder = document.getElementById('sumFounder');
+        const sumEmail = document.getElementById('sumEmail');
+        const sumTitle = document.getElementById('sumTitle');
+        const sumGoal = document.getElementById('sumGoal');
+
+        // Validation Function
+        function validateField(fieldName, isTyping = true) {
+            const field = fields[fieldName];
+            const val = field.input.value;
+            const res = field.validate(val);
+
+            // If we are just typing and haven't touched/exited, show error only if length > 0
+            if (val === '' && isTyping) {
+                field.msg.className = 'validation-msg';
+                field.msg.textContent = '';
+                field.input.className = '';
+                return false;
+            }
+
+            if (res.isValid) {
+                field.msg.className = 'validation-msg show-valid';
+                field.msg.innerHTML = `✓ ${res.success}`;
+                field.input.className = 'touched-valid';
+                return true;
+            } else {
+                field.msg.className = 'validation-msg show-error';
+                field.msg.innerHTML = `✗ ${res.err}`;
+                field.input.className = 'touched-invalid';
+                return false;
+            }
+        }
+
+        function checkFormValidity() {
+            let isFormValid = true;
+            for (const key in fields) {
+                const res = fields[key].validate(fields[key].input.value);
+                if (!res.isValid) {
+                    isFormValid = false;
+                }
+            }
+            submitBtn.disabled = !isFormValid;
+        }
+
+        // Attach Event Listeners
+        for (const key in fields) {
+            const el = fields[key].input;
+            
+            // Validate on input
+            el.addEventListener('input', () => {
+                validateField(key, true);
+                checkFormValidity();
+            });
+
+            // Validate on blur (exit field)
+            el.addEventListener('blur', () => {
+                validateField(key, false);
+                checkFormValidity();
+            });
+        }
+
+        // Handle Submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Final check
+            let isFormValid = true;
+            for (const key in fields) {
+                if (!validateField(key, false)) {
+                    isFormValid = false;
+                }
+            }
+
+            if (!isFormValid) {
+                checkFormValidity();
+                return;
+            }
+
+            // Show submit spinner loading state
+            btnSpinner.style.display = 'inline-block';
+            btnText.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+
+            // Simulate server network delays (800ms)
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Populate Modal Summary values
+            sumFounder.textContent = fields.fullName.input.value;
+            sumEmail.textContent = fields.email.input.value;
+            sumTitle.textContent = fields.campaignTitle.input.value;
+            sumGoal.textContent = `$${Number(fields.fundingGoal.input.value).toLocaleString()}`;
+
+            // Reset loading state
+            btnSpinner.style.display = 'none';
+            btnText.textContent = 'Submit Registration';
+            
+            // Show modal
+            modalOverlay.classList.add('active');
+        });
+
+        // Close Modal & Reset Form
+        modalCloseBtn.addEventListener('click', () => {
+            modalOverlay.classList.remove('active');
+            form.reset();
+            
+            // Reset validation states
+            for (const key in fields) {
+                const field = fields[key];
+                field.msg.className = 'validation-msg';
+                field.msg.textContent = '';
+                field.input.className = '';
+            }
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
