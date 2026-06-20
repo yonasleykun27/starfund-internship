@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sign in to your StarFund account to manage your investments and campaigns." />
+  <title>Sign In — StarFund</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Outfit', sans-serif; }
+    .gradient-text {
+      background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .input-field {
+      background: rgba(15,15,46,0.8);
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #e2e8f0;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field:focus {
+      border-color: rgba(99,102,241,0.7);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+      outline: none;
+    }
+    .input-field::placeholder { color: #475569; }
+    .glow-bg {
+      background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(99,102,241,0.12) 0%, transparent 70%);
+    }
+  </style>
+</head>
+<body class="bg-[#0a0a1a] text-slate-200 min-h-screen flex flex-col glow-bg">
+
+  <!-- HEADER -->
+  <header class="w-full px-6 py-5 flex items-center justify-between max-w-7xl mx-auto">
+    <a href="landing.html" class="text-xl font-black gradient-text">⭐ StarFund</a>
+    <p class="text-slate-400 text-sm">
+      Don't have an account?
+      <a href="register.html" class="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">Create one free →</a>
+    </p>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md">
+
+      <!-- Card -->
+      <div class="bg-[#0f0f2e]/80 border border-indigo-500/20 rounded-2xl p-8 backdrop-blur-sm">
+
+        <!-- Title -->
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-black text-slate-100 mb-2">Welcome back</h1>
+          <p class="text-slate-400 text-sm">Sign in to continue to your StarFund dashboard.</p>
+        </div>
+
+        <!-- Social Login -->
+        <div class="flex flex-col gap-3 mb-6">
+          <button class="flex items-center justify-center gap-3 w-full border border-slate-700/80 hover:border-indigo-500/40 bg-transparent text-slate-300 hover:text-white font-medium py-3 rounded-xl text-sm transition-all">
+            <span class="text-lg">🔵</span> Continue with Google
+          </button>
+        </div>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4 mb-6">
+          <div class="flex-1 h-px bg-indigo-500/15"></div>
+          <span class="text-slate-500 text-xs font-medium">or sign in with email</span>
+          <div class="flex-1 h-px bg-indigo-500/15"></div>
+        </div>
+
+        <!-- Form -->
+        <form action="landing.html" method="get" class="flex flex-col gap-5">
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-semibold text-slate-300 mb-2">Email Address</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              required
+              autocomplete="email"
+              class="input-field w-full px-4 py-3 rounded-xl text-sm"
+            />
+          </div>
+
+          <!-- Password -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label for="password" class="block text-sm font-semibold text-slate-300">Password</label>
+              <a href="#" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot password?</a>
+            </div>
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••••••"
+              required
+              autocomplete="current-password"
+              class="input-field w-full px-4 py-3 rounded-xl text-sm"
+            />
+          </div>
+
+          <!-- Remember Me -->
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" class="accent-indigo-500 w-4 h-4" />
+            <span class="text-sm text-slate-400">Remember me for 30 days</span>
+          </label>
+
+          <!-- Submit -->
+          <button
+            type="submit"
+            class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-sm transition-all hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-[1.02]"
+          >
+            Sign In →
+          </button>
+        </form>
+
+        <!-- Register Link -->
+        <p class="text-center text-sm text-slate-500 mt-6">
+          New to StarFund?
+          <a href="register.html" class="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">Create a free account</a>
+        </p>
+      </div>
+
+      <!-- Trust Badge -->
+      <div class="flex items-center justify-center gap-2 mt-6 text-slate-500 text-xs">
+        <span>🔒</span>
+        <span>Secured by 256-bit SSL encryption</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-6 px-6">
+    <p class="text-slate-600 text-xs">© 2024 StarFund. <a href="#" class="hover:text-slate-400 transition-colors">Privacy Policy</a> · <a href="#" class="hover:text-slate-400 transition-colors">Terms of Service</a></p>
+  </footer>
+
+</body>
+</html>
