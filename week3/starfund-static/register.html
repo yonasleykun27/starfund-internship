@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create your free StarFund account to invest in Ethiopian startups or launch your campaign." />
+  <title>Create Account — StarFund</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Outfit', sans-serif; }
+    .gradient-text {
+      background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .input-field {
+      background: rgba(15,15,46,0.8);
+      border: 1px solid rgba(99,102,241,0.25);
+      color: #e2e8f0;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field:focus {
+      border-color: rgba(99,102,241,0.7);
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+      outline: none;
+    }
+    .input-field::placeholder { color: #475569; }
+    .glow-bg {
+      background: radial-gradient(ellipse 70% 40% at 50% 0%, rgba(99,102,241,0.1) 0%, transparent 60%);
+    }
+    .role-card {
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .role-card:has(input:checked) {
+      border-color: rgba(99,102,241,0.6);
+      background: rgba(99,102,241,0.08);
+    }
+    .role-card:hover { border-color: rgba(99,102,241,0.35); }
+  </style>
+</head>
+<body class="bg-[#0a0a1a] text-slate-200 min-h-screen flex flex-col glow-bg">
+
+  <!-- HEADER -->
+  <header class="w-full px-6 py-5 flex items-center justify-between max-w-7xl mx-auto">
+    <a href="landing.html" class="text-xl font-black gradient-text">⭐ StarFund</a>
+    <p class="text-slate-400 text-sm">
+      Already have an account?
+      <a href="login.html" class="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">Sign in →</a>
+    </p>
+  </header>
+
+  <!-- MAIN -->
+  <main class="flex-1 flex items-start justify-center px-6 py-10">
+    <div class="w-full max-w-lg">
+
+      <!-- Card -->
+      <div class="bg-[#0f0f2e]/80 border border-indigo-500/20 rounded-2xl p-8 backdrop-blur-sm">
+
+        <!-- Title -->
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-black text-slate-100 mb-2">Join StarFund</h1>
+          <p class="text-slate-400 text-sm">Create your account and start building or investing today.</p>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="mb-6">
+          <p class="text-sm font-semibold text-slate-300 mb-3">I want to...</p>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="role-card bg-[#0a0a1a] rounded-xl p-4 flex flex-col items-center gap-2 text-center">
+              <input type="radio" name="role" value="investor" checked class="sr-only" />
+              <span class="text-2xl">💰</span>
+              <span class="text-sm font-bold text-slate-100">Invest</span>
+              <span class="text-xs text-slate-400">Back Ethiopian startups</span>
+            </label>
+            <label class="role-card bg-[#0a0a1a] rounded-xl p-4 flex flex-col items-center gap-2 text-center">
+              <input type="radio" name="role" value="founder" class="sr-only" />
+              <span class="text-2xl">🚀</span>
+              <span class="text-sm font-bold text-slate-100">Raise Funds</span>
+              <span class="text-xs text-slate-400">Launch my campaign</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Social -->
+        <button class="flex items-center justify-center gap-3 w-full border border-slate-700/80 hover:border-indigo-500/40 bg-transparent text-slate-300 hover:text-white font-medium py-3 rounded-xl text-sm transition-all mb-5">
+          <span class="text-lg">🔵</span> Continue with Google
+        </button>
+
+        <!-- Divider -->
+        <div class="flex items-center gap-4 mb-5">
+          <div class="flex-1 h-px bg-indigo-500/15"></div>
+          <span class="text-slate-500 text-xs font-medium">or register with email</span>
+          <div class="flex-1 h-px bg-indigo-500/15"></div>
+        </div>
+
+        <!-- Form -->
+        <form action="login.html" method="get" class="flex flex-col gap-4">
+
+          <!-- Name Row -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="first-name" class="block text-sm font-semibold text-slate-300 mb-2">First Name</label>
+              <input id="first-name" type="text" placeholder="Yonas" required class="input-field w-full px-4 py-3 rounded-xl text-sm" />
+            </div>
+            <div>
+              <label for="last-name" class="block text-sm font-semibold text-slate-300 mb-2">Last Name</label>
+              <input id="last-name" type="text" placeholder="Leykun" required class="input-field w-full px-4 py-3 rounded-xl text-sm" />
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="block text-sm font-semibold text-slate-300 mb-2">Email Address</label>
+            <input id="email" type="email" placeholder="you@example.com" required autocomplete="email" class="input-field w-full px-4 py-3 rounded-xl text-sm" />
+          </div>
+
+          <!-- Phone -->
+          <div>
+            <label for="phone" class="block text-sm font-semibold text-slate-300 mb-2">Phone Number <span class="text-slate-500 font-normal">(optional)</span></label>
+            <div class="flex">
+              <span class="flex items-center px-4 bg-[#0a0a1a] border border-r-0 border-indigo-500/25 text-slate-400 text-sm rounded-l-xl">🇪🇹 +251</span>
+              <input id="phone" type="tel" placeholder="9X XXX XXXX" class="input-field flex-1 px-4 py-3 rounded-r-xl text-sm border-l-0" style="border-left: none;" />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label for="password" class="block text-sm font-semibold text-slate-300 mb-2">Password</label>
+            <input id="password" type="password" placeholder="At least 8 characters" required autocomplete="new-password" class="input-field w-full px-4 py-3 rounded-xl text-sm" />
+            <!-- Strength indicator -->
+            <div class="flex gap-1 mt-2">
+              <div class="h-1 flex-1 rounded bg-green-500"></div>
+              <div class="h-1 flex-1 rounded bg-green-500"></div>
+              <div class="h-1 flex-1 rounded bg-slate-700"></div>
+              <div class="h-1 flex-1 rounded bg-slate-700"></div>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Password strength: <span class="text-yellow-400">Fair</span></p>
+          </div>
+
+          <!-- Terms -->
+          <label class="flex items-start gap-3 cursor-pointer mt-1">
+            <input type="checkbox" required class="accent-indigo-500 w-4 h-4 mt-0.5 flex-shrink-0" />
+            <span class="text-xs text-slate-400 leading-relaxed">
+              I agree to StarFund's <a href="#" class="text-indigo-400 hover:text-indigo-300 transition-colors">Terms of Service</a> and <a href="#" class="text-indigo-400 hover:text-indigo-300 transition-colors">Privacy Policy</a>. I confirm I am at least 18 years old.
+            </span>
+          </label>
+
+          <!-- Submit -->
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl text-sm transition-all hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-[1.02] mt-2">
+            Create Free Account →
+          </button>
+        </form>
+
+        <!-- Login Link -->
+        <p class="text-center text-sm text-slate-500 mt-5">
+          Already have an account?
+          <a href="login.html" class="text-indigo-400 hover:text-indigo-300 font-semibold transition-colors">Sign in</a>
+        </p>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="flex items-center justify-center gap-6 mt-6 text-slate-500 text-xs">
+        <span class="flex items-center gap-1.5">🔒 SSL Secured</span>
+        <span class="flex items-center gap-1.5">✅ Verified Platform</span>
+        <span class="flex items-center gap-1.5">🇪🇹 Ethiopia Regulated</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center py-6 px-6">
+    <p class="text-slate-600 text-xs">© 2024 StarFund. <a href="#" class="hover:text-slate-400 transition-colors">Privacy</a> · <a href="#" class="hover:text-slate-400 transition-colors">Terms</a></p>
+  </footer>
+
+</body>
+</html>
