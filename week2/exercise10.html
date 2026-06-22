@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="StarFund Internship - Exercise 10: JavaScript Debugging Dashboard.">
+    <title>Exercise 10: Visual Debugging Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --accent-warning: #f59e0b;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(17, 24, 39, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --code-bg: #090d16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding: 3rem 1.5rem;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(239, 68, 68, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(16, 185, 129, 0.03) 0%, transparent 40%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        /* Interactive Execution Dashboard */
+        .execution-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .execution-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .exec-control {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left;
+        }
+
+        .exec-control h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .exec-control p {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        .exec-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button.exec-btn {
+            flex-grow: 1;
+            padding: 0.9rem 1.25rem;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button.exec-btn.broken {
+            background: linear-gradient(135deg, var(--accent-danger) 0%, #dc2626 100%);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        button.exec-btn.fixed {
+            background: linear-gradient(135deg, var(--accent-success) 0%, #059669 100%);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        button.exec-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+
+        button.exec-btn:active {
+            transform: translateY(0);
+        }
+
+        .console-container {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--code-bg);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .console-log {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            height: 180px;
+            overflow-y: auto;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #d1d5db;
+        }
+
+        .log-entry {
+            margin-bottom: 0.4rem;
+        }
+
+        .log-entry.info { color: var(--accent-primary); }
+        .log-entry.error { color: var(--accent-danger); }
+        .log-entry.success { color: var(--accent-success); }
+        .log-entry.warn { color: var(--accent-warning); }
+
+        /* Bugs Explanation Layout */
+        .bugs-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            text-align: left;
+        }
+
+        .bug-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .bug-badge {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .bug-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .bug-explanation {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .code-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .code-box {
+            display: flex;
+            flex-direction: column;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .code-box-header {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            color: var(--text-secondary);
+            font-family: monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .code-box.broken-box .code-box-header {
+            background-color: rgba(239, 68, 68, 0.05);
+            border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+        }
+
+        .code-box.fixed-box .code-box-header {
+            background-color: rgba(16, 185, 129, 0.05);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        .code-box pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            color: #e5e7eb;
+            margin: 0;
+        }
+
+        .code-box pre code {
+            font-family: inherit;
+        }
+
+        .highlight-err-line {
+            background-color: rgba(239, 68, 68, 0.15);
+            display: block;
+            margin: 0 -1rem;
+            padding: 0 1rem;
+        }
+
+        .highlight-fix-line {
+            background-color: rgba(16, 185, 129, 0.15);
+            display: block;
+            margin: 0 -1rem;
+            padding: 0 1rem;
+        }
+
+        .back-nav {
+            margin-top: 3rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-nav:hover {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>JavaScript Debugging Dashboard</h1>
+        <p class="subtitle">Understand and debug common JavaScript pitfalls. Use the interactive log panel below to test the original buggy code vs. the fixed implementation.</p>
+
+        <!-- Interactive Runner Panel -->
+        <div class="execution-panel">
+            <div class="exec-control">
+                <h2>Interactive Tester</h2>
+                <p>Run both scripts inside your browser environment. Check the on-screen console to view runtime behavior, exceptions, and returned results.</p>
+                <div class="exec-buttons">
+                    <button class="exec-btn broken" id="runBrokenBtn">Run Broken Code</button>
+                    <button class="exec-btn fixed" id="runFixedBtn">Run Fixed Code</button>
+                </div>
+            </div>
+            <div class="console-container">
+                <div class="console-header">
+                    <span>CONSOLE OUTPUT</span>
+                    <span id="clearLogs" style="cursor: pointer; text-decoration: underline;">Clear</span>
+                </div>
+                <div class="console-log" id="consoleLog">
+                    <div class="log-entry info">Console ready. Click one of the buttons to execute tests.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bugs Breakdown -->
+        <div class="bugs-grid">
+            <!-- Bug 1 & 2 -->
+            <div class="bug-card">
+                <span class="bug-badge">Bugs 1 & 2</span>
+                <h3>Constant Reassignment & Missing Async Await</h3>
+                <p class="bug-explanation">
+                    <strong>Bug 1 (Const Reassignment):</strong> Modifying variables declared with <code>const</code> throws a TypeError. We must use <code>let</code> if the reference will change.<br>
+                    <strong>Bug 2 (Async Promise Resolution):</strong> Async functions return a <code>Promise</code>. Trying to read results directly yields the Promise object instead of the resolved data. We must place the <code>await</code> keyword before the function call (and mark the wrapper function as <code>async</code>).
+                </p>
+                <div class="code-comparison">
+                    <div class="code-box broken-box">
+                        <div class="code-box-header">Broken Code</div>
+                        <pre><code>function renderCampaignHeader(id) {
+  const defaultGoal = 100000;
+<span class="highlight-err-line">  const totalGoal = defaultGoal;</span>
+<span class="highlight-err-line">  const dbGoal = getCampaignGoal(id);</span>
+  if (dbGoal > 0) {
+<span class="highlight-err-line">    totalGoal = dbGoal; // Crashes</span>
+  }
+  return "Goal: $" + totalGoal;
+}</code></pre>
+                    </div>
+                    <div class="code-box fixed-box">
+                        <div class="code-box-header">Fixed Code</div>
+                        <pre><code><span class="highlight-fix-line">async function renderCampaignHeader(id) {</span>
+  const defaultGoal = 100000;
+<span class="highlight-fix-line">  let totalGoal = defaultGoal;</span>
+<span class="highlight-fix-line">  const dbGoal = await getCampaignGoal(id);</span>
+  if (dbGoal > 0) {
+<span class="highlight-fix-line">    totalGoal = dbGoal; // Works!</span>
+  }
+  return "Goal: $" + totalGoal;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bug 3 -->
+            <div class="bug-card">
+                <span class="bug-badge">Bug 3</span>
+                <h3>Implicit Global Variable Leakage</h3>
+                <p class="bug-explanation">
+                    Omitting variable declarations (<code>var</code>, <code>let</code>, <code>const</code>) inside loops implicitly attaches the iterator variable <code>i</code> to the global scope (<code>window</code> or <code>global</code>). This causes namespace pollution and leads to unexpected side-effects or infinite loops if nested functions run.
+                </p>
+                <div class="code-comparison">
+                    <div class="code-box broken-box">
+                        <div class="code-box-header">Broken Code</div>
+                        <pre><code>function displayInvestorList() {
+  let output = "";
+<span class="highlight-err-line">  for (i = 0; i < MOCK.length; i++) {</span>
+    output += (i + 1) + ". " + MOCK[i];
+  }
+  return output;
+}</code></pre>
+                    </div>
+                    <div class="code-box fixed-box">
+                        <div class="code-box-header">Fixed Code</div>
+                        <pre><code>function displayInvestorList() {
+  let output = "";
+<span class="highlight-fix-line">  for (let i = 0; i < MOCK.length; i++) {</span>
+    output += (i + 1) + ". " + MOCK[i];
+  }
+  return output;
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bug 4 -->
+            <div class="bug-card">
+                <span class="bug-badge">Bug 4</span>
+                <h3>Array Reference Comparison</h3>
+                <p class="bug-explanation">
+                    In JavaScript, objects and arrays are compared by **reference**, not by value. Declaring <code>tags === []</code> compares the array pointer against a brand new empty array pointer, which is **always false**. To verify if an array is empty, we must check its length: <code>tags.length === 0</code>.
+                </p>
+                <div class="code-comparison">
+                    <div class="code-box broken-box">
+                        <div class="code-box-header">Broken Code</div>
+                        <pre><code>function checkCampaignTags(id) {
+  const tags = getCampaignTags(id);
+<span class="highlight-err-line">  if (tags === []) {</span>
+    return "No tags assigned";
+  }
+  return "Tags: " + tags.join(", ");
+}</code></pre>
+                    </div>
+                    <div class="code-box fixed-box">
+                        <div class="code-box-header">Fixed Code</div>
+                        <pre><code>function checkCampaignTags(id) {
+  const tags = getCampaignTags(id);
+<span class="highlight-fix-line">  if (tags.length === 0) {</span>
+    return "No tags assigned";
+  }
+  return "Tags: " + tags.join(", ");
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bug 5 -->
+            <div class="bug-card">
+                <span class="bug-badge">Bug 5</span>
+                <h3>Unhandled Async/Promise Rejections</h3>
+                <p class="bug-explanation">
+                    Awaiting an async operation that rejects throws a runtime error. If not wrapped in a <code>try/catch</code> block, the exception bubbles up, resulting in an "Unhandled Promise Rejection" warning, which can crash Node environments or freeze UI execution.
+                </p>
+                <div class="code-comparison">
+                    <div class="code-box broken-box">
+                        <div class="code-box-header">Broken Code</div>
+                        <pre><code>async function executePurchase(userId, count) {
+  console.log("Initiating...");
+<span class="highlight-err-line">  await saveSharesToDatabase(userId, count);</span>
+  return "Purchase successful!";
+}</code></pre>
+                    </div>
+                    <div class="code-box fixed-box">
+                        <div class="code-box-header">Fixed Code</div>
+                        <pre><code>async function executePurchase(userId, count) {
+  console.log("Initiating...");
+<span class="highlight-fix-line">  try {</span>
+<span class="highlight-fix-line">    await saveSharesToDatabase(userId, count);</span>
+<span class="highlight-fix-line">    return "Purchase successful!";</span>
+<span class="highlight-fix-line">  } catch (error) {</span>
+<span class="highlight-fix-line">    return "Error: " + error.message;</span>
+<span class="highlight-fix-line">  }</span>
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="day10-landing.html" class="back-nav">← Back to Week 2 Overview</a>
+    </div>
+
+    <!-- Script Implementations -->
+    <script>
+        // Mocks
+        const MOCK_INVESTORS = ["Alice", "Bob", "Charlie", "David"];
+
+        async function getCampaignGoal(campaignId) {
+            return new Promise(resolve => setTimeout(() => resolve(250000), 50));
+        }
+
+        function getCampaignTags(campaignId) {
+            return []; // empty tags list
+        }
+
+        async function saveSharesToDatabase(userId, sharesCount) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => reject(new Error("Database write timeout.")), 50);
+            });
+        }
+
+        // Logger Helper
+        const consoleLog = document.getElementById('consoleLog');
+        const clearLogs = document.getElementById('clearLogs');
+
+        function log(msg, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `> ${msg}`;
+            consoleLog.appendChild(entry);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+
+        clearLogs.addEventListener('click', () => {
+            consoleLog.innerHTML = '<div class="log-entry info">Console cleared.</div>';
+        });
+
+        // ==========================================
+        // RUN BROKEN CODE
+        // ==========================================
+        async function runBrokenCode() {
+            log("--- RUNNING BROKEN IMPLEMENTATIONS ---", "warn");
+            
+            // 1. Test renderCampaignHeader
+            log("Running renderCampaignHeader(101)...");
+            try {
+                // Mock buggy logic
+                const defaultGoal = 100000;
+                const totalGoal = defaultGoal;
+                const dbGoal = getCampaignGoal(101); // Returns Promise
+                
+                log(`Result of getCampaignGoal: ${dbGoal} (Promise)`, 'info');
+                
+                // Comparing Promise to 0
+                if (dbGoal > 0) { // Promise object is truthy, but comparison is false or crashes
+                    log("Comparing Promise to 0 - truthy object checks...", 'info');
+                }
+                
+                // Triggering the type error
+                log("Reassigning totalGoal (const)...");
+                totalGoal = 250000; // Will throw TypeError
+                log("Success goal: " + totalGoal);
+            } catch (err) {
+                log(`CRASH in renderCampaignHeader: ${err.message}`, 'error');
+            }
+
+            // 2. Test displayInvestorList
+            log("Running displayInvestorList()...");
+            try {
+                // Global pollution test
+                let output = "";
+                for (i = 0; i < MOCK_INVESTORS.length; i++) {
+                    output += (i + 1) + ". " + MOCK_INVESTORS[i] + " | ";
+                }
+                log(`Investors: ${output}`);
+                log(`Checking global scope pollution: window.i = ${window.i} (Leaked global)`, 'warn');
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+
+            // 3. Test checkCampaignTags
+            log("Running checkCampaignTags(101)...");
+            try {
+                const tags = getCampaignTags(101); // returns []
+                log(`Fetched tags: [${tags}]`, 'info');
+                
+                if (tags === []) {
+                    log("Matched tags === []", 'success');
+                } else {
+                    log("tags === [] returned FALSE. Tag length checks failed because of object reference comparison.", 'error');
+                }
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+
+            // 4. Test executeSharePurchase
+            log("Running executeSharePurchase(1, 10) (Unhandled Reject)...");
+            try {
+                log("Initiating purchase...");
+                // Awaiting database rejection without try/catch
+                saveSharesToDatabase(1, 10).then(
+                    res => log("Promise Resolved: " + res, 'success'),
+                    err => {
+                        log("CRITICAL ERROR: Unhandled Promise Rejection!", 'error');
+                        log(`Error message: ${err.message}`, 'error');
+                    }
+                );
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+        }
+
+        // ==========================================
+        // RUN FIXED CODE
+        // ==========================================
+        // Clean implementation matching fixed boxes
+        async function fixedRenderCampaignHeader(campaignId) {
+            const defaultGoal = 100000;
+            let totalGoal = defaultGoal;
+            
+            const dbGoal = await getCampaignGoal(campaignId); 
+            if (dbGoal > 0) {
+                totalGoal = dbGoal;
+            }
+            return "Goal: $" + totalGoal.toLocaleString();
+        }
+
+        function fixedDisplayInvestorList() {
+            let output = "";
+            for (let i = 0; i < MOCK_INVESTORS.length; i++) {
+                output += (i + 1) + ". " + MOCK_INVESTORS[i] + " | ";
+            }
+            return output;
+        }
+
+        function fixedCheckCampaignTags(campaignId) {
+            const tags = getCampaignTags(campaignId);
+            if (tags.length === 0) {
+                return "No tags assigned";
+            }
+            return "Tags: " + tags.join(", ");
+        }
+
+        async function fixedExecuteSharePurchase(userId, sharesCount) {
+            log("Initiating purchase (fixed)...");
+            try {
+                await saveSharesToDatabase(userId, sharesCount);
+                return "Purchase successful!";
+            } catch (error) {
+                return `Transaction Failed: ${error.message}`;
+            }
+        }
+
+        async function runFixedCode() {
+            log("--- RUNNING FIXED IMPLEMENTATIONS ---", "success");
+
+            // Delete polluted global from window to ensure clean run
+            delete window.i;
+
+            // 1. Test renderCampaignHeader
+            log("Running renderCampaignHeader(101)...");
+            try {
+                const headerText = await fixedRenderCampaignHeader(101);
+                log(headerText, "success");
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+
+            // 2. Test displayInvestorList
+            log("Running displayInvestorList()...");
+            try {
+                const listText = fixedDisplayInvestorList();
+                log(`Investors: ${listText}`, "success");
+                log(`Checking global scope pollution: window.i = ${window.i} (Clean, not leaked)`, 'success');
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+
+            // 3. Test checkCampaignTags
+            log("Running checkCampaignTags(101)...");
+            try {
+                const tagsText = fixedCheckCampaignTags(101);
+                log(tagsText, "success");
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+
+            // 4. Test executeSharePurchase
+            log("Running executeSharePurchase(1, 10)...");
+            try {
+                const resultText = await fixedExecuteSharePurchase(1, 10);
+                log(resultText, resultText.startsWith('Transaction Failed') ? "warn" : "success");
+            } catch (err) {
+                log(`Error: ${err.message}`, 'error');
+            }
+        }
+
+        // Bind events
+        document.getElementById('runBrokenBtn').addEventListener('click', runBrokenCode);
+        document.getElementById('runFixedBtn').addEventListener('click', runFixedCode);
+    </script>
+</body>
+</html>

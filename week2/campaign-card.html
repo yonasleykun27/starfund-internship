@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StarFund | Dynamic Campaign Card</title>
+    
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #10b981; /* Emerald */
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            
+            /* Curated colors for title cycling */
+            --color-1: #6366f1; /* Indigo */
+            --color-2: #ec4899; /* Pink */
+            --color-3: #f59e0b; /* Amber */
+            --color-4: #10b981; /* Emerald */
+            --color-5: #3b82f6; /* Blue */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+
+        /* Branding and Header */
+        .brand-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+        }
+
+        .brand-logo span {
+            display: inline-block;
+            background: linear-gradient(to right, #818cf8, #34d399);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-section h1 {
+            font-family: var(--font-display);
+            font-size: 2.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.025em;
+        }
+
+        .brand-section p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Dynamic Card Styling */
+        .card-wrapper {
+            position: relative;
+            border-radius: 24px;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-wrapper:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 60px -15px rgba(99, 102, 241, 0.25);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .card-image-placeholder {
+            width: 100%;
+            height: 180px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-image-placeholder::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.8), transparent);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--accent-secondary);
+            color: #022c22;
+            z-index: 2;
+        }
+
+        .card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card-header-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .startup-name {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: color 0.4s ease;
+        }
+
+        .sector-tag {
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        /* Progress Bar Section */
+        .funding-progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-primary) 0%, #818cf8 100%);
+            border-radius: 9999px;
+            transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .stat-box {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 1.15rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Investors List Section */
+        .investors-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .investors-title {
+            font-family: var(--font-display);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .investors-count-badge {
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.15rem 0.4rem;
+            border-radius: 999px;
+            color: var(--text-secondary);
+        }
+
+        .investors-list {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            max-height: 100px;
+            overflow-y: auto;
+            padding-right: 0.25rem;
+        }
+
+        /* Scrollbar custom styling */
+        .investors-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .investors-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .investors-list::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 999px;
+        }
+
+        .investor-tag {
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            animation: popIn 0.3s ease-out forwards;
+        }
+
+        .investor-tag::before {
+            content: '🤝';
+            font-size: 0.7rem;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.85);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Interactive Controls Panel */
+        .control-panel {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .control-panel h2 {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 0.75rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        button {
+            font-family: var(--font-body);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        button.btn-primary {
+            background: var(--accent-primary);
+            border: none;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        button.btn-primary:hover {
+            background: #4f46e5;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="text"], input[type="number"] {
+            flex: 1;
+            font-family: var(--font-body);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--accent-primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Branding Section & Interactive Control Panel -->
+        <div class="brand-section">
+            <div class="brand-logo">
+                🌟 <span>StarFund</span>
+            </div>
+            <h1>Empowering Tech Innovation</h1>
+            <p>
+                Welcome to StarFund's interactive developer environment. This workspace showcases Week 2 Day 8 deliverables. Run operations using the control panel to manipulate DOM elements in real-time.
+            </p>
+            
+            <!-- Controls Panel -->
+            <div class="control-panel">
+                <h2>Practical Tasks Controls</h2>
+                
+                <!-- Task 1: Change Title Color -->
+                <div class="control-group">
+                    <span class="control-label">Task 1: Style Manipulation</span>
+                    <button id="btn-color-change">
+                        🎨 Cycle Title Color
+                    </button>
+                </div>
+                
+                <!-- Task 2: Update Funding % -->
+                <div class="control-group">
+                    <span class="control-label">Task 2: Progress & Percentage Manipulation</span>
+                    <div class="input-group">
+                        <input type="number" id="input-funding-amount" placeholder="Investment amount ($)" min="100">
+                        <button class="btn-primary" id="btn-update-funding">
+                            💰 Fund Campaign
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Task 3: Add New Investor -->
+                <div class="control-group">
+                    <span class="control-label">Task 3: Dynamic List Mutation</span>
+                    <div class="input-group">
+                        <input type="text" id="input-investor-name" placeholder="Investor's Full Name">
+                        <button id="btn-add-investor">
+                            ➕ Add Backer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Campaign Card (Dynamic Container) -->
+        <div>
+            <!-- All content inside card-wrapper is injected dynamically by JavaScript -->
+            <div class="card-wrapper" id="campaign-card-container">
+                <!-- Loading State placeholder -->
+                <div style="padding: 3rem; text-align: center; color: var(--text-secondary);">
+                    Initializing Campaign Card Data...
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JavaScript logic handling DOM manipulation and Data injection -->
+    <script>
+        // ==========================================
+        // DATA MODEL (Dynamic JS Object)
+        // ==========================================
+        const campaignData = {
+            startupName: "HealthAI Diagnostics",
+            sector: "Healthcare AI",
+            raised: 68500,
+            goal: 120000,
+            status: "active",
+            investors: ["Dr. Sarah Jenkins", "Yonas L.", "Alex Rivera", "Elena Rostova", "Marcus Chen"]
+        };
+
+        // Current color cycle index for Task 1
+        let titleColorIndex = 0;
+        const colorPalette = [
+            "var(--color-1)",
+            "var(--color-2)",
+            "var(--color-3)",
+            "var(--color-4)",
+            "var(--color-5)"
+        ];
+
+        // ==========================================
+        // CARD INITIAL RENDERING FUNCTION
+        // ==========================================
+        function renderCampaignCard(data) {
+            const container = document.getElementById("campaign-card-container");
+            
+            // Calculate funding percentage
+            const fundingPercent = Math.min(Math.round((data.raised / data.goal) * 100), 200);
+            
+            // Construct the inner HTML using clean semantic components and placeholders
+            container.innerHTML = `
+                <div class="card-badge">${data.status}</div>
+                <div class="card-image-placeholder">
+                    ${data.startupName} Pitch Deck
+                </div>
+                <div class="card-info">
+                    <div class="card-header-group">
+                        <h3 class="startup-name" id="card-startup-title">${data.startupName}</h3>
+                        <span class="sector-tag">${data.sector}</span>
+                    </div>
+                    
+                    <div class="funding-progress-container">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <span class="stat-label">Progress</span>
+                            <span style="font-weight: 700; color: var(--accent-secondary);" id="card-percentage-text">${fundingPercent}%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="card-progress-bar" style="width: ${fundingPercent}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="stat-value" id="card-raised-text">$${data.raised.toLocaleString()}</span>
+                            <span class="stat-label">Raised</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value">$${data.goal.toLocaleString()}</span>
+                            <span class="stat-label">Goal</span>
+                        </div>
+                    </div>
+                    
+                    <div class="investors-section">
+                        <div class="investors-title">
+                            <span>Recent Backers</span>
+                            <span class="investors-count-badge" id="card-investor-count">${data.investors.length} Backers</span>
+                        </div>
+                        <ul class="investors-list" id="card-investors-list">
+                            ${data.investors.map(name => `<li class="investor-tag">${name}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // PRACTICAL CODING TASKS IMPLEMENTATIONS
+        // ==========================================
+
+        /**
+         * TASK 1: Change Title Color
+         * Cycles through a curated set of hex colors on the startup name element.
+         */
+        function changeTitleColor() {
+            const titleEl = document.getElementById("card-startup-title");
+            if (titleEl) {
+                titleColorIndex = (titleColorIndex + 1) % colorPalette.length;
+                titleEl.style.color = colorPalette[titleColorIndex];
+                console.log(`[DOM Mutation] Changed Title Color to: ${colorPalette[titleColorIndex]}`);
+            }
+        }
+
+        /**
+         * TASK 2: Update Funding Percentage
+         * Increases the raised amount dynamically, calculates the new percentage,
+         * updates the percentage text, the raw raised text, and animates the progress bar.
+         */
+        function simulateInvestment(amount) {
+            if (isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid investment amount!");
+                return;
+            }
+
+            // Update underlying JS object state
+            campaignData.raised += amount;
+            
+            // Recalculate
+            const fundingPercent = Math.min(Math.round((campaignData.raised / campaignData.goal) * 100), 200);
+
+            // Update DOM Elements
+            const percentageText = document.getElementById("card-percentage-text");
+            const progressBar = document.getElementById("card-progress-bar");
+            const raisedText = document.getElementById("card-raised-text");
+
+            if (percentageText && progressBar && raisedText) {
+                percentageText.textContent = `${fundingPercent}%`;
+                progressBar.style.width = `${fundingPercent}%`;
+                raisedText.textContent = `$${campaignData.raised.toLocaleString()}`;
+                
+                // If it hits or exceeds 100%, change badge status to funded
+                if (campaignData.raised >= campaignData.goal) {
+                    campaignData.status = "funded";
+                    const badge = document.querySelector(".card-badge");
+                    if (badge) {
+                        badge.textContent = "funded";
+                        badge.style.background = "var(--color-5)";
+                        badge.style.color = "#ffffff";
+                    }
+                }
+                
+                console.log(`[DOM Mutation] Simulated investment: $${amount}. New Total Raised: $${campaignData.raised}. New Percentage: ${fundingPercent}%`);
+            }
+        }
+
+        /**
+         * TASK 3: Add New Investor to List
+         * Dynamically creates a new list item and appends it to the backers list,
+         * while incrementing the count badge.
+         */
+        function addNewInvestor(name) {
+            const trimmedName = name.trim();
+            if (!trimmedName) {
+                alert("Please enter a valid name!");
+                return;
+            }
+
+            // Update state
+            campaignData.investors.push(trimmedName);
+
+            // Access parent list
+            const listEl = document.getElementById("card-investors-list");
+            const countEl = document.getElementById("card-investor-count");
+
+            if (listEl && countEl) {
+                // Create new list element
+                const newTag = document.createElement("li");
+                newTag.className = "investor-tag";
+                newTag.textContent = trimmedName;
+
+                // Append to list
+                listEl.appendChild(newTag);
+
+                // Update count badge
+                countEl.textContent = `${campaignData.investors.length} Backers`;
+
+                // Scroll list to bottom to show new addition
+                listEl.scrollTop = listEl.scrollHeight;
+
+                console.log(`[DOM Mutation] Added new investor: "${trimmedName}". Total count: ${campaignData.investors.length}`);
+            }
+        }
+
+        // ==========================================
+        // EVENT LISTENERS & INITIALIZATION
+        // ==========================================
+        window.addEventListener("DOMContentLoaded", () => {
+            // Initial render
+            renderCampaignCard(campaignData);
+
+            // Bind Task 1: Color Changer
+            document.getElementById("btn-color-change").addEventListener("click", changeTitleColor);
+
+            // Bind Task 2: Fund Campaign
+            document.getElementById("btn-update-funding").addEventListener("click", () => {
+                const amountInput = document.getElementById("input-funding-amount");
+                const amount = parseInt(amountInput.value);
+                simulateInvestment(amount);
+                amountInput.value = ""; // Clear input
+            });
+
+            // Bind Task 3: Add Backer
+            document.getElementById("btn-add-investor").addEventListener("click", () => {
+                const nameInput = document.getElementById("input-investor-name");
+                const name = nameInput.value;
+                addNewInvestor(name);
+                nameInput.value = ""; // Clear input
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="StarFund Internship - Exercise 7: Dynamic Campaign Countdown Timer.">
+    <title>Exercise 7: Campaign Countdown Timer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --accent-primary: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --accent-success: #10b981;
+            --accent-danger: #ef4444;
+            --accent-warning: #f59e0b;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.05) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.05) 0%, transparent 45%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #fff 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        /* Campaign Preview Card */
+        .campaign-card {
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .campaign-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: var(--accent-primary);
+        }
+
+        .campaign-card.ended::before {
+            background-color: var(--text-secondary);
+        }
+
+        .campaign-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .category-badge {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent-primary);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .category-badge.ended {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+        }
+
+        .campaign-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .campaign-desc {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Countdown Timer Display */
+        .timer-display {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .timer-block {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 0.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .timer-block.highlight {
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.05);
+        }
+
+        .timer-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .timer-block.highlight .timer-num {
+            color: var(--accent-primary);
+        }
+
+        .timer-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+            font-weight: 500;
+        }
+
+        /* Ended Overlay Overlay */
+        .ended-overlay {
+            display: none;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: var(--accent-danger);
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 1.25rem;
+            text-align: center;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        /* Controls / Interaction */
+        .controls-card {
+            background-color: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: left;
+        }
+
+        .controls-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        button.timer-btn {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: none;
+        }
+
+        button.timer-btn:hover {
+            background-color: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        button.timer-btn:active {
+            transform: translateY(0);
+        }
+
+        .custom-time-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .custom-time-group input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .custom-time-group input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        button.btn-apply {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, #2563eb 100%);
+            border: none;
+            color: white;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button.btn-apply:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(59, 130, 246, 0.35);
+        }
+
+        .back-nav {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+        }
+
+        .back-nav:hover {
+            color: var(--text-primary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Campaign Countdown Timer</h1>
+        <p class="subtitle">Displays seconds remaining for a StarFund campaign. Try extending the timer, resetting it, or simulating an expired campaign using the controls below.</p>
+
+        <div class="campaign-card" id="campaignCard">
+            <div class="campaign-header">
+                <span class="category-badge" id="categoryBadge">AEROSPACE</span>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);" id="statusIndicator">Active</span>
+            </div>
+            <h2 class="campaign-title">AeroDrones Crowdfunding</h2>
+            <p class="campaign-desc">Building autonomous cargo drones for regional logistics networks. Support our campaign before the deadline closes.</p>
+
+            <div class="timer-display">
+                <div class="timer-block">
+                    <span class="timer-num" id="daysVal">00</span>
+                    <span class="timer-label">Days</span>
+                </div>
+                <div class="timer-block">
+                    <span class="timer-num" id="hoursVal">00</span>
+                    <span class="timer-label">Hours</span>
+                </div>
+                <div class="timer-block">
+                    <span class="timer-num" id="minsVal">00</span>
+                    <span class="timer-label">Minutes</span>
+                </div>
+                <div class="timer-block highlight">
+                    <span class="timer-num" id="secsVal">00</span>
+                    <span class="timer-label">Seconds</span>
+                </div>
+            </div>
+
+            <div class="ended-overlay" id="endedOverlay">
+                Campaign Ended! Over-the-counter funding closed.
+            </div>
+        </div>
+
+        <div class="controls-card">
+            <h3>Simulation Controls</h3>
+            <div class="btn-grid">
+                <button class="timer-btn" id="btn30s">Set to 30 Seconds</button>
+                <button class="timer-btn" id="btn5m">Set to 5 Minutes</button>
+                <button class="timer-btn" id="btn1h">Set to 1 Hour</button>
+                <button class="timer-btn" id="btnExpired">Set to Expired</button>
+            </div>
+            
+            <div class="custom-time-group">
+                <input type="datetime-local" id="customDateTime" required>
+                <button class="btn-apply" id="btnApplyCustom">Apply Date</button>
+            </div>
+        </div>
+
+        <a href="day10-landing.html" class="back-nav">← Back to Week 2 Overview</a>
+    </div>
+
+    <script>
+        // DOM Elements
+        const daysVal = document.getElementById('daysVal');
+        const hoursVal = document.getElementById('hoursVal');
+        const minsVal = document.getElementById('minsVal');
+        const secsVal = document.getElementById('secsVal');
+        
+        const campaignCard = document.getElementById('campaignCard');
+        const categoryBadge = document.getElementById('categoryBadge');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const endedOverlay = document.getElementById('endedOverlay');
+        
+        const btn30s = document.getElementById('btn30s');
+        const btn5m = document.getElementById('btn5m');
+        const btn1h = document.getElementById('btn1h');
+        const btnExpired = document.getElementById('btnExpired');
+        
+        const customDateTime = document.getElementById('customDateTime');
+        const btnApplyCustom = document.getElementById('btnApplyCustom');
+
+        // State: target end date timestamp
+        let targetEndTime = Date.now() + 45000; // default 45 seconds
+        let timerInterval = null;
+
+        function updateCountdown() {
+            const now = Date.now();
+            const timeRemaining = targetEndTime - now;
+
+            if (timeRemaining <= 0) {
+                // Timer reached 0
+                daysVal.textContent = '00';
+                hoursVal.textContent = '00';
+                minsVal.textContent = '00';
+                secsVal.textContent = '00';
+                
+                // Expiry UI States
+                campaignCard.classList.add('ended');
+                categoryBadge.classList.add('ended');
+                statusIndicator.textContent = 'Ended';
+                statusIndicator.style.color = 'var(--accent-danger)';
+                endedOverlay.style.display = 'block';
+                
+                clearInterval(timerInterval);
+                return;
+            }
+
+            // Reset Expiry UI if restarted
+            campaignCard.classList.remove('ended');
+            categoryBadge.classList.remove('ended');
+            statusIndicator.textContent = 'Active';
+            statusIndicator.style.color = 'var(--accent-success)';
+            endedOverlay.style.display = 'none';
+
+            // Calculate intervals
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+            // Render
+            daysVal.textContent = days.toString().padStart(2, '0');
+            hoursVal.textContent = hours.toString().padStart(2, '0');
+            minsVal.textContent = minutes.toString().padStart(2, '0');
+            secsVal.textContent = seconds.toString().padStart(2, '0');
+        }
+
+        function restartTimer(durationMs) {
+            targetEndTime = Date.now() + durationMs;
+            if (timerInterval) clearInterval(timerInterval);
+            updateCountdown();
+            timerInterval = setInterval(updateCountdown, 1000);
+        }
+
+        // Event Listeners
+        btn30s.addEventListener('click', () => restartTimer(30 * 1000));
+        btn5m.addEventListener('click', () => restartTimer(5 * 60 * 1000));
+        btn1h.addEventListener('click', () => restartTimer(60 * 60 * 1000));
+        btnExpired.addEventListener('click', () => restartTimer(-1000));
+
+        btnApplyCustom.addEventListener('click', () => {
+            const inputVal = customDateTime.value;
+            if (!inputVal) {
+                alert("Please select a valid date & time.");
+                return;
+            }
+            
+            const selectedTime = new Date(inputVal).getTime();
+            const now = Date.now();
+            
+            targetEndTime = selectedTime;
+            if (timerInterval) clearInterval(timerInterval);
+            updateCountdown();
+            timerInterval = setInterval(updateCountdown, 1000);
+        });
+
+        // Set default custom date input to 1 day in future
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
+        customDateTime.value = tomorrow.toISOString().slice(0, 16);
+
+        // Start timer
+        restartTimer(45000);
+    </script>
+</body>
+</html>
