@@ -75,5 +75,27 @@ Focuses on utility-first CSS design, responsive prefixes, custom brand configura
 7. **Interactive States**: Added hover states (`transform: translateY`, shadow glow, link text color shifts) to all buttons, dashboard items, and cards.
 8. **Utility-First Design**: Implemented complete layouts using only Tailwind CSS utility classes, extending custom brand color schemes through Tailwind configuration scripts.
 
+---
+
+## Day 15 — Full StarFund Static Site (Completed)
+
+The Week 3 capstone milestone. Built all 5 required StarFund static pages using Tailwind CSS via CDN, semantic HTML5, responsive design, and a consistent brand design system.
+
+### Files Included:
+
+*   **[starfund-static/landing.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/starfund-static/landing.html)**: Landing Page — Hero section with stats bar, featured campaign cards grid, How It Works steps, and CTA section.
+*   **[starfund-static/browse.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/starfund-static/browse.html)**: Browse Campaigns — Search bar hero, sidebar filters (sector, stage, sort), responsive 3-column campaign grid, and pagination.
+*   **[starfund-static/startup-detail.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/starfund-static/startup-detail.html)**: Startup Detail — Campaign hero image, problem/solution cards, team profiles, sticky investment sidebar with funding progress and tiers.
+*   **[starfund-static/login.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/starfund-static/login.html)**: Login Page — Glassmorphism auth card with Google OAuth, email/password form, remember me, and trust badge.
+*   **[starfund-static/register.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/starfund-static/register.html)**: Register Page — Role selection cards (Investor/Founder), full registration form with phone number, password strength indicator, and trust badges.
+*   **[starfund-static/README.md](file:///c:/Users/Y/Desktop/starfund-internship/week3/starfund-static/README.md)**: Static site documentation with design system, responsiveness table, page linking map, and full mentor evaluation checklist.
+
+---
+
+## Practical Exercise 15 — CSS Debug Challenge (Completed)
+
+*   **[exercise15.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/exercise15.html)**: Practical Exercise 15. A full CSS debugging exercise identifying and fixing **6 intentional layout bugs** in a structured dark-themed UI. Each bug is documented with the original broken code, the corrected fix, and a live visual demonstration. Bugs fixed: missing box-sizing reset, non-sticky header, fixed-pixel grid overflow, flexbox vertical misalignment, negative z-index hiding element, and overflow clipping failure.
+
+
 
 
