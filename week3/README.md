@@ -31,10 +31,32 @@ Focuses on one-dimensional layouts using CSS Flexbox, handling alignment, fluid 
 
 ---
 
+## Day 13 — CSS Grid & Responsive Design (Completed)
+
+Focuses on two-dimensional layouts using CSS Grid, responsive design principles, and mobile-first media queries.
+
+### Files Included:
+
+*   **[day13.js](file:///c:/Users/Y/Desktop/starfund-internship/week3/day13.js)**: Detailed study guide and learning notes covering grid tracks, fr units, spacing gaps, grid line positioning, grid-template-areas, and responsive media query breakpoints.
+*   **[browse-page.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/browse-page.html)**: Daily Assignment. Updated the campaigns grid section to use **CSS Grid** with mobile-first media queries:
+    *   **Mobile View (< 768px)**: 1-column layout (`grid-template-columns: 1fr`).
+    *   **Tablet View (768px - 1023px)**: 2-column layout (`grid-template-columns: repeat(2, 1fr)`).
+    *   **Desktop View (1024px+)**: 3-column layout (`grid-template-columns: repeat(3, 1fr)`).
+*   **[founder-dashboard.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/founder-dashboard.html)**: Practical Task. A premium Founder Dashboard layout utilizing CSS Grid for its major structure:
+    *   **Main Structure**: A 2-column grid featuring a fixed 240px sidebar on the left and a flexible main content panel on the right (`grid-template-columns: 240px 1fr`).
+    *   **Metrics Stats Bar**: Inside the main panel, a 3-column stats grid displays real-time metrics (`grid-template-columns: repeat(3, 1fr)`).
+    *   **Responsive Collapse**: On mobile viewports, the layout collapses into a single-column structure with the sidebar hidden to maintain visual balance.
+*   **[exercise13.html](file:///c:/Users/Y/Desktop/starfund-internship/week3/exercise13.html)**: Practical Exercise 13. A pure CSS-only interactive tooltip system requiring **zero JavaScript**. Uses custom attributes (`data-tooltip` and `data-tooltip-dir`) alongside CSS transitions and transforms to render tooltips in all four directions (top, bottom, left, right).
+
+---
+
 ## Technical Standards Applied
 1. **Zero Div Layouts**: Strictly avoided generic nested `<div>` wrappers inside component tasks. Built structure via native HTML5 roles.
-2. **Modern Flexbox Layouts**: Avoided layout floats, position hacks, and fixed pixel grid widths. Used container flex layout, gaps, and responsive basis.
-3. **Global box-sizing reset**: Configured `box-sizing: border-box` to ensure padding and border values are contained within the defined width and height.
-4. **Sticky Alignment**: Implemented sticky header using `position: sticky` along with `backdrop-filter: blur(12px)` for premium UI appearance.
-5. **Interactive States**: Added hover states (`transform: translateY`, shadow glow, link text color shifts) to all buttons, profile cards, and header items.
+2. **Two-Dimensional Grid Layouts**: Replaced flex rows and floats with native CSS Grid for complex grids (e.g. Founder Dashboard, Campaigns Grid).
+3. **Mobile-First Media Queries**: Structured responsive behaviors starting from mobile viewports, applying `min-width` queries to progressively enhance layouts for larger viewports.
+4. **Global box-sizing reset**: Configured `box-sizing: border-box` to ensure padding and border values are contained within the defined width and height.
+5. **Sticky Alignment**: Implemented sticky header using `position: sticky` along with `backdrop-filter: blur(12px)` for premium UI appearance.
+6. **Pure CSS Interactivity**: Leveraged pseudo-elements (`::before`/`::after`) and attribute selectors to build interactive tooltips with zero JS performance overhead.
+7. **Interactive States**: Added hover states (`transform: translateY`, shadow glow, link text color shifts) to all buttons, dashboard items, and cards.
+
 

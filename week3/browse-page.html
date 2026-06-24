@@ -429,14 +429,14 @@
             font-family: inherit;
         }
 
-        /* 5. Campaign Grid (Flex Wrap) */
+        /* 5. Campaign Grid (CSS Grid) */
         section.campaigns-grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr; /* Mobile-first: 1 column */
             gap: 24px;
         }
 
-        /* 6. Campaign Card (Flex Column) */
+        /* 6. Campaign Card (Flex Column inside Grid) */
         article.campaign-card {
             background-color: var(--color-card-bg);
             border: 1px solid var(--color-border);
@@ -444,8 +444,6 @@
             overflow: hidden;
             display: flex;
             flex-direction: column; /* Stacks image, content, footer */
-            flex: 1 1 calc(33.333% - 16px); /* 3 columns desktop, min-width wraps */
-            min-width: 300px;
             transition: var(--transition);
         }
 
@@ -632,11 +630,17 @@
         }
 
         /* --------------------------------------------------
-           RESPONSIVE BREAKPOINTS (CSS Only)
+           RESPONSIVE BREAKPOINTS (Mobile-First / Grid Columns)
            -------------------------------------------------- */
-        @media (max-width: 992px) {
-            article.campaign-card {
-                flex: 1 1 calc(50% - 12px); /* 2 columns tablet */
+        @media (min-width: 768px) {
+            section.campaigns-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns on tablet */
+            }
+        }
+
+        @media (min-width: 1024px) {
+            section.campaigns-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on desktop */
             }
         }
 
@@ -684,10 +688,6 @@
             .search-sort-group {
                 max-width: 100%;
                 justify-content: space-between;
-            }
-
-            article.campaign-card {
-                flex: 1 1 100%; /* 1 column mobile */
             }
 
             .footer-wrap {
