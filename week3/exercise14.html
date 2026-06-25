@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 14 — Animated Progress Bars | StarFund</title>
+    <meta name="description" content="Exercise 14: Premium animated progress bars using CSS transitions, keyframe animations, and custom SVG rings. Complete with interactive live controls.">
+    <style>
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        /* CSS Variables / Design Tokens */
+        :root {
+            --color-primary: #6c47ff;
+            --color-primary-light: #8b6bff;
+            --color-accent: #00d4aa;
+            --color-bg: #0f0d1a;
+            --color-card-bg: #1a1730;
+            --color-border: rgba(108, 71, 255, 0.2);
+            --color-text-primary: #f1eeff;
+            --color-text-secondary: #a09bcc;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --transition-bar: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-circle: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-ui: all 0.2s ease;
+        }
+
+        /* Reset & Base Box Model */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            padding: 60px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header.exercise-header {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 48px;
+        }
+
+        header.exercise-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, var(--color-primary-light), var(--color-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header.exercise-header p {
+            color: var(--color-text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Main Container Layout */
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* Card Panels */
+        .panel-card {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .panel-card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-primary-light);
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* --------------------------------------------------
+           PROGRESS BAR COMPONENTS
+           -------------------------------------------------- */
+        .progress-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .progress-label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .progress-title {
+            color: var(--color-text-primary);
+        }
+
+        .progress-percentage {
+            color: var(--color-accent);
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        /* The Outer Track */
+        .progress-track {
+            width: 100%;
+            height: 12px;
+            background-color: rgba(108, 71, 255, 0.08);
+            border: 1px solid rgba(108, 71, 255, 0.15);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* The Filling Bar */
+        .progress-fill {
+            height: 100%;
+            width: 0%; /* Dynamic width */
+            border-radius: 10px;
+            transition: var(--transition-bar);
+        }
+
+        /* Theme Styles for Progress Bar */
+        /* 1. Classic Solid Brand Purple */
+        .fill-brand {
+            background-color: var(--color-primary);
+            box-shadow: 0 0 12px rgba(108, 71, 255, 0.4);
+        }
+
+        /* 2. Premium Gradient (StarFund Signature) */
+        .fill-gradient {
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            box-shadow: 0 0 16px rgba(0, 212, 170, 0.3);
+        }
+
+        /* 3. Striped with Translation Animation */
+        .fill-striped {
+            background-image: linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.15) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.15) 75%,
+                transparent 75%,
+                transparent
+            );
+            background-size: 30px 30px;
+            background-color: var(--color-primary-light);
+            box-shadow: 0 0 12px rgba(139, 107, 255, 0.4);
+            animation: moveStripes 1s linear infinite;
+        }
+
+        /* Keyframes for sliding stripes */
+        @keyframes moveStripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 30px 0; }
+        }
+
+        /* --------------------------------------------------
+           CIRCULAR PROGRESS INDICATOR (Bonus)
+           -------------------------------------------------- */
+        .circular-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 20px 0;
+        }
+
+        .svg-ring-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+
+        .svg-ring-wrapper svg {
+            transform: rotate(-90deg); /* Start from the top */
+        }
+
+        .svg-ring-bg {
+            fill: none;
+            stroke: rgba(108, 71, 255, 0.08);
+            stroke-width: 8px;
+        }
+
+        .svg-ring-fill {
+            fill: none;
+            stroke: url(#ring-gradient);
+            stroke-width: 8px;
+            stroke-linecap: round;
+            stroke-dasharray: 339.29; /* 2 * PI * r (r=54) */
+            stroke-dashoffset: 339.29; /* Starts empty */
+            transition: var(--transition-circle);
+        }
+
+        .circular-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--color-accent);
+            font-family: monospace;
+        }
+
+        /* --------------------------------------------------
+           LIVE CONTROLS STYLING
+           -------------------------------------------------- */
+        .controls-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .btn-control {
+            background-color: rgba(108, 71, 255, 0.1);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition-ui);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-control:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            transform: translateY(-1px);
+        }
+
+        .btn-control:active {
+            transform: translateY(0);
+        }
+
+        .presets-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .adjusters-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Details info box */
+        .info-box {
+            background-color: rgba(255,255,255,0.01);
+            border: 1px dashed var(--color-border);
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 0.85rem;
+            color: var(--color-text-secondary);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="exercise-header">
+        <h1>Exercise 14 — Animated Progress Bars</h1>
+        <p>A premium exploration of CSS Transitions and Keyframe Animations. Watch the progress bars animate smoothly as you dynamically adjust their values.</p>
+    </header>
+
+    <main class="container">
+        
+        <!-- LEFT COLUMN: Progress Bars Display -->
+        <section class="panel-card">
+            <h2>
+                <span>📊 Live Components</span>
+                <span id="current-value-badge" style="background: rgba(0, 212, 170, 0.15); color: var(--color-accent); font-size: 0.8rem; padding: 4px 10px; border-radius: 100px; border: 1px solid rgba(0, 212, 170, 0.2);">Value: 65%</span>
+            </h2>
+
+            <!-- 1. Classic Solid -->
+            <div class="progress-group">
+                <div class="progress-label-row">
+                    <span class="progress-title">Solid Primary (Flexibility & Alignment)</span>
+                    <span class="progress-percentage" id="val-brand">65%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill fill-brand" id="bar-brand" style="width: 65%;"></div>
+                </div>
+            </div>
+
+            <!-- 2. Premium Gradient -->
+            <div class="progress-group">
+                <div class="progress-label-row">
+                    <span class="progress-title">Signature Gradient (StarFund Style)</span>
+                    <span class="progress-percentage" id="val-gradient">65%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill fill-gradient" id="bar-gradient" style="width: 65%;"></div>
+                </div>
+            </div>
+
+            <!-- 3. Animated Stripes -->
+            <div class="progress-group">
+                <div class="progress-label-row">
+                    <span class="progress-title">Animated Stripes & Glow (Infinite Translation)</span>
+                    <span class="progress-percentage" id="val-striped">65%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill fill-striped" id="bar-striped" style="width: 65%;"></div>
+                </div>
+            </div>
+
+            <!-- Implementation Details -->
+            <div class="info-box">
+                <h3 style="font-size: 0.95rem; color: var(--color-text-primary); font-weight: 700;">CSS Mechanics Under the Hood:</h3>
+                <ul>
+                    <li><strong>CSS Transitions</strong>: The filling bars use <code>transition: var(--transition-bar);</code> which specifies a 0.8-second duration with a customized cubic-bezier curve for high-end, elastic filling behaviors.</li>
+                    <li><strong>Keyframe Translation</strong>: The striped bar utilizes <code>animation: moveStripes 1s linear infinite;</code> translating the background position to create an endless moving stripe effect.</li>
+                    <li><strong>SVG Stroke Manipulation</strong>: The Circular Ring updates its <code>stroke-dashoffset</code> property, transitioning the stroke length programmatically.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Interactive Controls & Ring -->
+        <div style="display: flex; flex-direction: column; gap: 32px;">
+            
+            <!-- Circular Ring Panel -->
+            <section class="panel-card">
+                <h2>Ring Indicator</h2>
+                <div class="circular-container">
+                    <div class="svg-ring-wrapper">
+                        <svg width="120" height="120">
+                            <!-- Gradient Definition -->
+                            <defs>
+                                <linearGradient id="ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="var(--color-primary)" />
+                                    <stop offset="100%" stop-color="var(--color-accent)" />
+                                </linearGradient>
+                            </defs>
+                            <!-- BG Track -->
+                            <circle class="svg-ring-bg" cx="60" cy="60" r="54" />
+                            <!-- Active Fill -->
+                            <circle class="svg-ring-fill" id="circle-fill" cx="60" cy="60" r="54" />
+                        </svg>
+                        <div class="circular-text" id="ring-text">65%</div>
+                    </div>
+                    <span style="font-size: 0.8rem; color: var(--color-text-secondary); text-align: center;">SVG Circular Progress</span>
+                </div>
+            </section>
+
+            <!-- Controller Panel -->
+            <section class="panel-card">
+                <h2>🎛️ Live Controls</h2>
+                <div class="controls-grid">
+                    
+                    <!-- Presets -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <span style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">Jump to Preset:</span>
+                        <div class="presets-row">
+                            <button class="btn-control" onclick="updateProgress(0)">0%</button>
+                            <button class="btn-control" onclick="updateProgress(25)">25%</button>
+                            <button class="btn-control" onclick="updateProgress(50)">50%</button>
+                            <button class="btn-control" onclick="updateProgress(75)">75%</button>
+                            <button class="btn-control" onclick="updateProgress(100)">100%</button>
+                        </div>
+                    </div>
+
+                    <!-- Step adjustments -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <span style="font-size: 0.8rem; color: var(--color-text-secondary); font-weight: 600;">Adjust Value:</span>
+                        <div class="adjusters-row">
+                            <button class="btn-control" onclick="adjustProgress(-10)">➖ -10%</button>
+                            <button class="btn-control" onclick="adjustProgress(10)">➕ +10%</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- JavaScript to Bind Visual States -->
+    <script>
+        // Store current global progress state
+        let currentProgress = 65;
+        const maxOffset = 339.29; // 2 * PI * r (r=54)
+
+        // Function to update progress across all indicators
+        function updateProgress(value) {
+            // Constrain value between 0 and 100
+            currentProgress = Math.min(100, Math.max(0, value));
+
+            // 1. Update Badge & Labels
+            document.getElementById('current-value-badge').innerText = `Value: ${currentProgress}%`;
+            document.getElementById('val-brand').innerText = `${currentProgress}%`;
+            document.getElementById('val-gradient').innerText = `${currentProgress}%`;
+            document.getElementById('val-striped').innerText = `${currentProgress}%`;
+            document.getElementById('ring-text').innerText = `${currentProgress}%`;
+
+            // 2. Update Progress Bar Widths
+            document.getElementById('bar-brand').style.width = `${currentProgress}%`;
+            document.getElementById('bar-gradient').style.width = `${currentProgress}%`;
+            document.getElementById('bar-striped').style.width = `${currentProgress}%`;
+
+            // 3. Update SVG Circular Ring Dashoffset
+            // Offset = MaxOffset * (1 - Progress/100)
+            const offset = maxOffset * (1 - currentProgress / 100);
+            document.getElementById('circle-fill').style.strokeDashoffset = offset;
+        }
+
+        // Adjust progress by incremental steps (+/-)
+        function adjustProgress(amount) {
+            updateProgress(currentProgress + amount);
+        }
+
+        // Run initial load animation trigger
+        window.addEventListener('DOMContentLoaded', () => {
+            // Start at 0 on immediate render, then animate to 65% for a cool loading effect
+            updateProgress(0);
+            setTimeout(() => {
+                updateProgress(65);
+            }, 150);
+        });
+    </script>
+</body>
+</html>
