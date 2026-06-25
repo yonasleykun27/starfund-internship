@@ -1,6 +1,8 @@
 import React from 'react';
 import Hero from './components/Hero';
 import CampaignCard from './components/CampaignCard';
+import FundingProgress from './components/FundingProgress';
+import FollowButton from './components/FollowButton';
 import './App.css';
 
 // Mock startup data for Day 16
@@ -44,16 +46,32 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-6 sm:p-12">
       <div className="max-w-6xl mx-auto">
-        {/* Day 16: Render Hero component with dynamic props */}
+        {/* Day 16: Render Hero component */}
         <Hero 
           heading="Back the ventures that matter most." 
           subheading="StarFund connects growth-stage founders with a curated network of impact-driven investors. Start supporting sustainable projects today." 
         />
 
+        {/* Day 17: Interactive State Demos */}
+        <div className="mb-10">
+          <div className="border-b border-slate-800 pb-3 mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Day 17: State & Interaction Demos</h2>
+            <p className="text-sm text-slate-400 mt-1">Testing React useState hooks on isolated components</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            <FundingProgress goal={500000} initialRaised={345000} />
+            <FollowButton initialFollowers={1458} />
+          </div>
+        </div>
+
         {/* Day 16: Render CampaignCard grid */}
-        <div className="mb-8 flex justify-between items-center">
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Featured Campaigns</h2>
-          <span className="text-sm text-slate-400">Showing 3 active startups</span>
+        <div className="mb-6 flex justify-between items-center border-b border-slate-800 pb-3">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Day 16: Static Component Demos</h2>
+            <p className="text-sm text-slate-400 mt-1">Props flowing dynamically down to child layouts</p>
+          </div>
+          <span className="text-sm text-slate-400">Showing 3 startups</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
