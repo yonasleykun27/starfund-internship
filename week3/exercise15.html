@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exercise 15 — CSS Debug Challenge | StarFund</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* =====================================================
+       EXERCISE 15 — CSS DEBUG CHALLENGE
+       Task: Find and fix the 6 intentional layout bugs
+       Each bug is marked with a BUG comment.
+       Each fix is marked with a FIX comment.
+    ===================================================== */
+
+    /* ---------- DESIGN TOKENS ---------- */
+    :root {
+      --bg-dark:       #0a0a1a;
+      --bg-card:       #0f0f2e;
+      --border:        rgba(99,102,241,0.25);
+      --indigo:        #6366f1;
+      --indigo-light:  #818cf8;
+      --purple:        #c084fc;
+      --text-primary:  #e2e8f0;
+      --text-muted:    #94a3b8;
+      --green:         #4ade80;
+      --red:           #f87171;
+      --radius:        12px;
+      --gap:           24px;
+    }
+
+    /* ---------- RESET ---------- */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+
+      /* BUG 1 (FIXED): Missing box-sizing reset caused padding to add
+         extra width and broke layout calculations.
+         ORIGINAL BROKEN CODE: (no box-sizing rule at all)
+         FIX: box-sizing: border-box ensures padding is included in width */
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ---------- HEADER ---------- */
+    .header {
+      background: rgba(15,15,46,0.9);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      /* BUG 2 (FIXED): position: relative with no stacking context caused
+         the header to scroll away instead of staying fixed at the top.
+         ORIGINAL BROKEN CODE: position: relative;
+         FIX: position: sticky with top: 0 keeps the header in view */
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-logo {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--indigo-light), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .header-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 15px;
+      transition: color 0.2s;
+    }
+
+    .header-nav a:hover { color: var(--text-primary); }
+
+    /* ---------- PAGE WRAPPER ---------- */
+    .page { padding: 60px 40px; max-width: 1100px; margin: 0 auto; }
+
+    /* ---------- PAGE TITLE ---------- */
+    .page-title {
+      font-size: 36px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--indigo-light), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .page-subtitle {
+      color: var(--text-muted);
+      margin-bottom: 48px;
+      font-size: 16px;
+    }
+
+    /* ---------- BUG SHOWCASE GRID ---------- */
+    .bugs-grid {
+      display: grid;
+
+      /* BUG 3 (FIXED): grid-template-columns: repeat(3, 300px) used fixed
+         pixel widths, which caused horizontal overflow on smaller screens
+         and prevented responsive behavior.
+         ORIGINAL BROKEN CODE: grid-template-columns: repeat(3, 300px);
+         FIX: Use fractional units so columns share available space equally */
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--gap);
+      margin-bottom: 48px;
+    }
+
+    @media (max-width: 768px) {
+      .bugs-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- BUG CARD ---------- */
+    .bug-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .bug-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      display: inline-block;
+    }
+
+    .bug-label.fixed  { background: rgba(74,222,128,0.12); color: var(--green); }
+    .bug-label.broken { background: rgba(248,113,113,0.12); color: var(--red); }
+
+    .bug-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .bug-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    .code-block {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .code-broken { color: var(--red); }
+    .code-fixed  { color: var(--green); }
+    .code-label  { color: var(--text-muted); font-size: 11px; margin-bottom: 4px; }
+
+    /* ---------- DEMO SECTION: Bug 4 — Flexbox Alignment ---------- */
+    .flex-demo-section { margin-bottom: 40px; }
+
+    .flex-demo-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--indigo-light);
+      margin-bottom: 16px;
+    }
+
+    .flex-demo {
+      display: flex;
+      align-items: center; /* BUG 4 FIXED — was: align-items: flex-start (items were misaligned vertically) */
+      gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .flex-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--indigo), var(--purple));
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .flex-info { flex: 1; }
+    .flex-name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    .flex-role { font-size: 13px; color: var(--text-muted); }
+
+    .flex-badge {
+      background: rgba(99,102,241,0.15);
+      border: 1px solid var(--border);
+      color: var(--indigo-light);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ---------- DEMO SECTION: Bug 5 — Z-Index Stacking ---------- */
+    .zindex-demo {
+      position: relative;
+      height: 120px;
+      margin-bottom: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .zindex-back {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 200px;
+      height: 80px;
+      background: rgba(99,102,241,0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--indigo-light);
+
+      /* BUG 5 (FIXED): z-index: -1 caused the back panel to go behind the
+         container background, making it invisible.
+         ORIGINAL BROKEN CODE: z-index: -1;
+         FIX: z-index: 1 keeps it behind the front panel but visible */
+      z-index: 1;
+    }
+
+    .zindex-front {
+      position: absolute;
+      top: 30px;
+      left: 80px;
+      width: 200px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--indigo), var(--purple));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: white;
+      z-index: 2;
+    }
+
+    /* ---------- DEMO SECTION: Bug 6 — Overflow Clipping ---------- */
+    .overflow-demo {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 40px;
+    }
+
+    .overflow-demo-inner {
+      width: 100%;
+
+      /* BUG 6 (FIXED): overflow: visible allowed the long text inside to
+         break out of its container and create horizontal page scrolling.
+         ORIGINAL BROKEN CODE: overflow: visible;
+         FIX: overflow: hidden clips content inside the container properly */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text-muted);
+      font-size: 14px;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+    }
+
+    /* ---------- SUMMARY TABLE ---------- */
+    .summary-section { margin-top: 20px; }
+
+    .summary-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--indigo-light);
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: rgba(99,102,241,0.15);
+      color: var(--indigo-light);
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    td {
+      padding: 12px 16px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    td:first-child { color: var(--text-primary); font-weight: 600; }
+
+    .status-fixed {
+      color: var(--green);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-logo">⭐ StarFund</div>
+    <nav>
+      <ul class="header-nav">
+        <li><a href="./starfund-static/landing.html">Home</a></li>
+        <li><a href="./starfund-static/browse.html">Browse</a></li>
+        <li><a href="./exercise15.html" style="color:#818cf8;">Exercise 15</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="page">
+    <h1 class="page-title">Exercise 15 — CSS Debug Challenge</h1>
+    <p class="page-subtitle">Find and fix 6 intentional CSS layout bugs. Each bug is documented below with the broken code and the correct fix.</p>
+
+    <!-- BUG CARDS GRID -->
+    <div class="bugs-grid">
+
+      <!-- Bug 1 -->
+      <div class="bug-card">
+        <span class="bug-label fixed">✅ Bug 1 Fixed</span>
+        <div class="bug-title">Missing box-sizing Reset</div>
+        <div class="bug-desc">Without <code>box-sizing: border-box</code>, padding adds extra width outside the defined width, breaking layout calculations and causing overflow.</div>
+        <div class="code-label">❌ Broken:</div>
+        <div class="code-block code-broken">* { margin: 0; padding: 0; }<br>/* No box-sizing rule! */</div>
+        <div class="code-label">✅ Fixed:</div>
+        <div class="code-block code-fixed">*, *::before, *::after {<br>  box-sizing: border-box;<br>}</div>
+      </div>
+
+      <!-- Bug 2 -->
+      <div class="bug-card">
+        <span class="bug-label fixed">✅ Bug 2 Fixed</span>
+        <div class="bug-title">Header Not Sticky</div>
+        <div class="bug-desc">The header used <code>position: relative</code> which causes it to scroll away with the page content instead of remaining fixed at the top of the viewport.</div>
+        <div class="code-label">❌ Broken:</div>
+        <div class="code-block code-broken">.header {<br>  position: relative;<br>}</div>
+        <div class="code-label">✅ Fixed:</div>
+        <div class="code-block code-fixed">.header {<br>  position: sticky;<br>  top: 0;<br>  z-index: 100;<br>}</div>
+      </div>
+
+      <!-- Bug 3 -->
+      <div class="bug-card">
+        <span class="bug-label fixed">✅ Bug 3 Fixed</span>
+        <div class="bug-title">Fixed Grid Columns Overflow</div>
+        <div class="bug-desc">Using fixed <code>300px</code> columns prevents the grid from adapting to different screen sizes, causing horizontal scrollbars on mobile and tablet viewports.</div>
+        <div class="code-label">❌ Broken:</div>
+        <div class="code-block code-broken">grid-template-columns:<br>  repeat(3, 300px);</div>
+        <div class="code-label">✅ Fixed:</div>
+        <div class="code-block code-fixed">grid-template-columns:<br>  repeat(3, 1fr);</div>
+      </div>
+
+      <!-- Bug 4 -->
+      <div class="bug-card">
+        <span class="bug-label fixed">✅ Bug 4 Fixed</span>
+        <div class="bug-title">Flexbox Vertical Misalignment</div>
+        <div class="bug-desc">Using <code>align-items: flex-start</code> in a flex row causes items of different heights to snap to the top edge instead of centering vertically.</div>
+        <div class="code-label">❌ Broken:</div>
+        <div class="code-block code-broken">.flex-demo {<br>  align-items: flex-start;<br>}</div>
+        <div class="code-label">✅ Fixed:</div>
+        <div class="code-block code-fixed">.flex-demo {<br>  align-items: center;<br>}</div>
+      </div>
+
+      <!-- Bug 5 -->
+      <div class="bug-card">
+        <span class="bug-label fixed">✅ Bug 5 Fixed</span>
+        <div class="bug-title">z-index: -1 Hides Element</div>
+        <div class="bug-desc">Using <code>z-index: -1</code> on an absolutely-positioned element causes it to render behind the container background, making it completely invisible to the user.</div>
+        <div class="code-label">❌ Broken:</div>
+        <div class="code-block code-broken">.zindex-back {<br>  z-index: -1;<br>}</div>
+        <div class="code-label">✅ Fixed:</div>
+        <div class="code-block code-fixed">.zindex-back {<br>  z-index: 1;<br>}</div>
+      </div>
+
+      <!-- Bug 6 -->
+      <div class="bug-card">
+        <span class="bug-label fixed">✅ Bug 6 Fixed</span>
+        <div class="bug-title">Overflow: visible Breaks Layout</div>
+        <div class="bug-desc">Using <code>overflow: visible</code> allows text content to bleed outside its container and creates unwanted horizontal page scroll on narrow screens.</div>
+        <div class="code-label">❌ Broken:</div>
+        <div class="code-block code-broken">.text-box {<br>  overflow: visible;<br>}</div>
+        <div class="code-label">✅ Fixed:</div>
+        <div class="code-block code-fixed">.text-box {<br>  overflow: hidden;<br>  text-overflow: ellipsis;<br>  white-space: nowrap;<br>}</div>
+      </div>
+    </div>
+
+    <!-- DEMO: BUG 4 - FLEX ALIGNMENT -->
+    <div class="flex-demo-section">
+      <div class="flex-demo-title">🔴 Bug 4 Live Demo — Flexbox Vertical Alignment Fixed</div>
+      <div class="flex-demo">
+        <div class="flex-avatar">👤</div>
+        <div class="flex-info">
+          <div class="flex-name">Yonas Leykun</div>
+          <div class="flex-role">Full-Stack Developer Intern</div>
+        </div>
+        <div class="flex-badge">Active</div>
+      </div>
+    </div>
+
+    <!-- DEMO: BUG 5 - Z-INDEX -->
+    <div class="flex-demo-title">🔴 Bug 5 Live Demo — Z-Index Stacking Fixed</div>
+    <div class="zindex-demo">
+      <div class="zindex-back">Back Panel (z-index: 1)</div>
+      <div class="zindex-front">Front Panel (z-index: 2)</div>
+    </div>
+
+    <!-- DEMO: BUG 6 - OVERFLOW -->
+    <div class="flex-demo-title">🔴 Bug 6 Live Demo — Overflow Clipping Fixed</div>
+    <div class="overflow-demo">
+      <div class="overflow-demo-inner">
+        This is an extremely long text that would normally break outside its container and cause horizontal scrolling issues on the page — but with overflow: hidden and text-overflow: ellipsis it is clipped correctly and stays inside the box.
+      </div>
+    </div>
+
+    <!-- SUMMARY TABLE -->
+    <div class="summary-section">
+      <div class="summary-title">📋 Bug Fix Summary</div>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Bug Type</th>
+            <th>Broken Property</th>
+            <th>Fixed Property</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Box Model Reset</td>
+            <td>No box-sizing rule</td>
+            <td>box-sizing: border-box</td>
+            <td><span class="status-fixed">✅ Fixed</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Sticky Header</td>
+            <td>position: relative</td>
+            <td>position: sticky; top: 0</td>
+            <td><span class="status-fixed">✅ Fixed</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Grid Overflow</td>
+            <td>repeat(3, 300px)</td>
+            <td>repeat(3, 1fr)</td>
+            <td><span class="status-fixed">✅ Fixed</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Flex Alignment</td>
+            <td>align-items: flex-start</td>
+            <td>align-items: center</td>
+            <td><span class="status-fixed">✅ Fixed</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Z-Index Stacking</td>
+            <td>z-index: -1</td>
+            <td>z-index: 1</td>
+            <td><span class="status-fixed">✅ Fixed</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Overflow Clipping</td>
+            <td>overflow: visible</td>
+            <td>overflow: hidden + text-overflow: ellipsis</td>
+            <td><span class="status-fixed">✅ Fixed</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+</body>
+</html>
