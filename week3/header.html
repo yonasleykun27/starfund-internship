@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 11 Assignment — StarFund Semantic Header</title>
+    <meta name="description" content="StarFund page header using only semantic HTML5 tags and CSS flexbox. Rebuild with no layout divs.">
+    <style>
+        /* Import Google Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        /* CSS Variables / Design Tokens */
+        :root {
+            --color-primary: #6c47ff;
+            --color-primary-light: #8b6bff;
+            --color-accent: #00d4aa;
+            --color-bg: #0f0d1a;
+            --color-surface: rgba(26, 23, 48, 0.85);
+            --color-border: rgba(108, 71, 255, 0.2);
+            --color-text-primary: #f1eeff;
+            --color-text-secondary: #a09bcc;
+            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Reset & Base Box Model */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            min-height: 150vh; /* Allow scrolling to test sticky header */
+            line-height: 1.6;
+        }
+
+        /* --------------------------------------------------
+           SEMANTIC STICKY HEADER (Zero Divs!)
+           -------------------------------------------------- */
+        header.site-header {
+            position: fixed; /* or sticky, but fixed is robust for absolute page positioning */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--color-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            transition: var(--transition);
+        }
+
+        /* Logo using anchor + inline styling or specific elements */
+        header.site-header a.logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--color-text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        header.site-header a.logo span {
+            color: var(--color-primary-light);
+        }
+
+        /* Custom SVG or character icon as logo image (semantic!) */
+        header.site-header a.logo svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--color-primary-light);
+        }
+
+        /* Semantic Primary Navigation */
+        header.site-header nav.main-navigation {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        /* Navigation List - using ul/li for list-based nav */
+        header.site-header nav.main-navigation ul {
+            display: flex;
+            list-style: none;
+            gap: 28px;
+            align-items: center;
+        }
+
+        header.site-header nav.main-navigation a.nav-link {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            padding: 6px 0;
+        }
+
+        header.site-header nav.main-navigation a.nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--color-accent);
+            transition: var(--transition);
+        }
+
+        header.site-header nav.main-navigation a.nav-link:hover {
+            color: var(--color-text-primary);
+        }
+
+        header.site-header nav.main-navigation a.nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Auth Actions - styled semantically in an aside/section/group of buttons */
+        header.site-header nav.main-navigation menu.auth-menu {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+            align-items: center;
+        }
+
+        header.site-header nav.main-navigation menu.auth-menu a.btn-login {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            padding: 10px 20px;
+            transition: var(--transition);
+        }
+
+        header.site-header nav.main-navigation menu.auth-menu a.btn-login:hover {
+            color: var(--color-primary-light);
+        }
+
+        header.site-header nav.main-navigation menu.auth-menu a.btn-register {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: none;
+            background-color: var(--color-primary);
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(108, 71, 255, 0.3);
+        }
+
+        header.site-header nav.main-navigation menu.auth-menu a.btn-register:hover {
+            background-color: var(--color-primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(108, 71, 255, 0.45);
+        }
+
+        /* --------------------------------------------------
+           DEMO CONTENT (To showcase stickiness)
+           -------------------------------------------------- */
+        main.demo-container {
+            margin-top: calc(var(--header-height) + 40px);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 20px;
+        }
+
+        main.demo-container section.card {
+            background: #1a1730;
+            border: 1px solid var(--color-border);
+            padding: 32px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        main.demo-container h2 {
+            margin-bottom: 16px;
+            color: var(--color-primary-light);
+        }
+
+        main.demo-container p {
+            margin-bottom: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            header.site-header {
+                padding: 0 20px;
+            }
+
+            header.site-header nav.main-navigation {
+                gap: 16px;
+            }
+
+            header.site-header nav.main-navigation ul {
+                display: none; /* In a real project, this would be a hamburger menu */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Semantic Sticky Header (Logo on Left, Nav & Actions on Right) -->
+    <header class="site-header" role="banner">
+        <!-- Logo on the left -->
+        <a href="#" class="logo" aria-label="StarFund Homepage">
+            <!-- Inline SVG Logo -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            Star<span>Fund</span>
+        </a>
+
+        <!-- Navigation and authentication controls on the right -->
+        <nav class="main-navigation" aria-label="Primary navigation">
+            <!-- Navigation Links -->
+            <ul>
+                <li><a href="#" class="nav-link">Browse</a></li>
+                <li><a href="#" class="nav-link">How It Works</a></li>
+            </ul>
+
+            <!-- Authentication Controls (using semantic menu list) -->
+            <menu class="auth-menu" type="toolbar">
+                <li><a href="#" class="btn-login">Login</a></li>
+                <li><a href="#" class="btn-register">Register</a></li>
+            </menu>
+        </nav>
+    </header>
+
+    <!-- Demo Content to demonstrate scrolling & sticky nature of header -->
+    <main class="demo-container">
+        <section class="card">
+            <h2>Day 11 Daily Assignment Summary</h2>
+            <p><strong>Goal:</strong> Build the StarFund page header: logo left, navigation links (Browse, How It Works, Login, Register) right — using only HTML + CSS.</p>
+            <p><strong>Constraints Met:</strong></p>
+            <ol style="margin-left: 20px; margin-bottom: 12px; color: var(--color-text-secondary);">
+                <li>No layout <code>&lt;div&gt;</code> elements used. Layout is handled entirely using <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;ul&gt;</code>, <code>&lt;menu&gt;</code>, and <code>&lt;a&gt;</code>.</li>
+                <li>CSS Flexbox is used to align logo to the left and navigation/buttons to the right.</li>
+                <li>Sticky alignment using <code>position: fixed</code> at the top of the viewport.</li>
+            </ol>
+        </section>
+
+        <section class="card">
+            <h2>Semantic HTML Breakdown</h2>
+            <p>By using tags like <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, and <code>&lt;menu&gt;</code>, we describe the exact functionality of each section to the browser and assistive engines. This avoids tag pollution and improves overall code readability and SEO score.</p>
+        </section>
+        
+        <section class="card">
+            <h2>Sticky Positioning Demonstration</h2>
+            <p>Scroll down this page to see the header remain stuck at the top with a beautiful blur effect overlaying the content behind it.</p>
+            <p>This is achieved using <code>position: fixed; top: 0; left: 0; width: 100%</code>, combined with a modern <code>backdrop-filter: blur(12px)</code> styling to produce a premium frosted-glass design aesthetic.</p>
+        </section>
+    </main>
+
+</body>
+</html>
