@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="StarFund — Ethiopia's premier startup crowdfunding platform. Connect visionary founders with impact investors." />
+  <title>StarFund — Fund Ethiopia's Next Big Idea</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            purple: { 400: '#c084fc', 500: '#a855f7' },
+            dark: {
+              900: '#0a0a1a',
+              800: '#0f0f2e',
+              700: '#1a1a3e',
+            }
+          },
+          fontFamily: { outfit: ['Outfit', 'sans-serif'] },
+          backdropBlur: { xs: '4px' }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Outfit', sans-serif; }
+    .gradient-text {
+      background: linear-gradient(135deg, #818cf8, #c084fc, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-glow {
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.15) 0%, transparent 70%);
+    }
+    .card-glow:hover {
+      box-shadow: 0 0 32px rgba(99,102,241,0.2);
+    }
+    /* Mobile nav toggle */
+    #mobile-menu { display: none; }
+    #mobile-menu.open { display: block; }
+  </style>
+</head>
+<body class="bg-[#0a0a1a] text-slate-200 min-h-screen">
+
+  <!-- ======================== HEADER ======================== -->
+  <header class="sticky top-0 z-50 bg-[#0a0a1a]/90 backdrop-blur-md border-b border-indigo-500/20">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="landing.html" class="text-xl font-black gradient-text tracking-tight">⭐ StarFund</a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="browse.html" class="text-slate-400 hover:text-slate-200 text-sm font-medium transition-colors">Browse</a>
+        <a href="startup-detail.html" class="text-slate-400 hover:text-slate-200 text-sm font-medium transition-colors">Startups</a>
+        <a href="#how" class="text-slate-400 hover:text-slate-200 text-sm font-medium transition-colors">How It Works</a>
+        <a href="login.html" class="text-slate-400 hover:text-slate-200 text-sm font-medium transition-colors">Sign In</a>
+        <a href="register.html" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors">Get Started</a>
+      </nav>
+
+      <!-- Mobile Hamburger -->
+      <button id="hamburger-btn" class="md:hidden flex flex-col gap-1.5 p-2" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+        <span class="w-6 h-0.5 bg-slate-300 block"></span>
+        <span class="w-6 h-0.5 bg-slate-300 block"></span>
+        <span class="w-6 h-0.5 bg-slate-300 block"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu Drawer -->
+    <div id="mobile-menu" class="md:hidden border-t border-indigo-500/20 bg-[#0f0f2e] px-6 py-4 flex flex-col gap-4">
+      <a href="browse.html" class="text-slate-300 text-sm font-medium">Browse Campaigns</a>
+      <a href="startup-detail.html" class="text-slate-300 text-sm font-medium">Startups</a>
+      <a href="#how" class="text-slate-300 text-sm font-medium">How It Works</a>
+      <a href="login.html" class="text-slate-300 text-sm font-medium">Sign In</a>
+      <a href="register.html" class="bg-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-lg text-center">Get Started</a>
+    </div>
+  </header>
+
+  <!-- ======================== HERO ======================== -->
+  <section class="relative hero-glow pt-28 pb-24 px-6 text-center overflow-hidden">
+    <!-- Background decorative circles -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full bg-indigo-600/5 blur-3xl pointer-events-none"></div>
+
+    <div class="relative max-w-4xl mx-auto">
+      <span class="inline-block bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 uppercase tracking-widest">
+        🇪🇹 Ethiopia's #1 Startup Platform
+      </span>
+      <h1 class="text-5xl md:text-7xl font-black leading-tight mb-6">
+        <span class="gradient-text">Fund the Future</span><br />
+        <span class="text-slate-200">of Ethiopia</span>
+      </h1>
+      <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+        StarFund connects visionary Ethiopian entrepreneurs with impact investors. Back real startups, track your investments, and be part of the next big success story.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="browse.html" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl text-base transition-all hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/25">
+          Explore Campaigns →
+        </a>
+        <a href="register.html" class="border border-indigo-500/40 hover:border-indigo-400 text-slate-300 hover:text-white font-semibold px-8 py-4 rounded-xl text-base transition-all">
+          Start Your Campaign
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="relative mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+      <div class="bg-[#0f0f2e] border border-indigo-500/20 rounded-2xl p-6 text-center">
+        <div class="text-3xl font-black gradient-text">240+</div>
+        <div class="text-slate-400 text-sm mt-1">Active Campaigns</div>
+      </div>
+      <div class="bg-[#0f0f2e] border border-indigo-500/20 rounded-2xl p-6 text-center">
+        <div class="text-3xl font-black gradient-text">12K+</div>
+        <div class="text-slate-400 text-sm mt-1">Investors</div>
+      </div>
+      <div class="bg-[#0f0f2e] border border-indigo-500/20 rounded-2xl p-6 text-center">
+        <div class="text-3xl font-black gradient-text">4.2M</div>
+        <div class="text-slate-400 text-sm mt-1">ETB Raised</div>
+      </div>
+      <div class="bg-[#0f0f2e] border border-indigo-500/20 rounded-2xl p-6 text-center">
+        <div class="text-3xl font-black gradient-text">98%</div>
+        <div class="text-slate-400 text-sm mt-1">Success Rate</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== FEATURED CAMPAIGNS ======================== -->
+  <section class="py-24 px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-14">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-100 mb-4">🔥 Featured Campaigns</h2>
+      <p class="text-slate-400 text-lg">Handpicked startups ready for their next breakthrough.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Card 1 -->
+      <article class="bg-[#0f0f2e] border border-indigo-500/20 rounded-2xl overflow-hidden hover:border-indigo-500/40 transition-all duration-300 card-glow hover:-translate-y-1 group">
+        <div class="h-44 bg-gradient-to-br from-indigo-600/40 to-purple-600/40 flex items-center justify-center text-5xl">🌱</div>
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-3">
+            <span class="bg-green-500/10 text-green-400 text-xs font-bold px-3 py-1 rounded-full border border-green-500/20">AgriTech</span>
+            <span class="text-slate-400 text-xs">14 days left</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-100 mb-2 group-hover:text-indigo-300 transition-colors">EthioFarm Connect</h3>
+          <p class="text-slate-400 text-sm mb-4 line-clamp-2">Connecting smallholder farmers directly to urban markets using AI-powered supply chain technology.</p>
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-slate-400">Raised: <span class="text-indigo-400 font-semibold">280,000 ETB</span></span>
+              <span class="text-slate-400 font-semibold">70%</span>
+            </div>
+            <div class="w-full bg-slate-700/50 rounded-full h-1.5">
+              <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style="width:70%"></div>
+            </div>
+          </div>
+          <a href="startup-detail.html" class="w-full block text-center bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 hover:border-indigo-500 text-indigo-300 hover:text-white font-semibold py-2.5 rounded-xl text-sm transition-all">
+            View Campaign
+          </a>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="bg-[#0f0f2e] border border-indigo-500/20 rounded-2xl overflow-hidden hover:border-indigo-500/40 transition-all duration-300 card-glow hover:-translate-y-1 group">
+        <div class="h-44 bg-gradient-to-br from-purple-600/40 to-pink-600/40 flex items-center justify-center text-5xl">⚡</div>
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-3">
+            <span class="bg-yellow-500/10 text-yellow-400 text-xs font-bold px-3 py-1 rounded-full border border-yellow-500/20">CleanEnergy</span>
+            <span class="text-slate-400 text-xs">30 days left</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-100 mb-2 group-hover:text-indigo-300 transition-colors">SolarHub Ethiopia</h3>
+          <p class="text-slate-400 text-sm mb-4 line-clamp-2">Affordable solar micro-grids bringing clean electricity to off-grid rural communities across Ethiopia.</p>
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-slate-400">Raised: <span class="text-indigo-400 font-semibold">450,000 ETB</span></span>
+              <span class="text-slate-400 font-semibold">90%</span>
+            </div>
+            <div class="w-full bg-slate-700/50 rounded-full h-1.5">
+              <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style="width:90%"></div>
+            </div>
+          </div>
+          <a href="startup-detail.html" class="w-full block text-center bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 hover:border-indigo-500 text-indigo-300 hover:text-white font-semibold py-2.5 rounded-xl text-sm transition-all">
+            View Campaign
+          </a>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="bg-[#0f0f2e] border border-indigo-500/20 rounded-2xl overflow-hidden hover:border-indigo-500/40 transition-all duration-300 card-glow hover:-translate-y-1 group">
+        <div class="h-44 bg-gradient-to-br from-cyan-600/40 to-blue-600/40 flex items-center justify-center text-5xl">💊</div>
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-3">
+            <span class="bg-cyan-500/10 text-cyan-400 text-xs font-bold px-3 py-1 rounded-full border border-cyan-500/20">HealthTech</span>
+            <span class="text-slate-400 text-xs">7 days left</span>
+          </div>
+          <h3 class="text-lg font-bold text-slate-100 mb-2 group-hover:text-indigo-300 transition-colors">Dawa Digital</h3>
+          <p class="text-slate-400 text-sm mb-4 line-clamp-2">A telemedicine platform connecting patients in rural areas with licensed doctors via SMS and mobile app.</p>
+          <div class="mb-4">
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-slate-400">Raised: <span class="text-indigo-400 font-semibold">120,000 ETB</span></span>
+              <span class="text-slate-400 font-semibold">48%</span>
+            </div>
+            <div class="w-full bg-slate-700/50 rounded-full h-1.5">
+              <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-1.5 rounded-full" style="width:48%"></div>
+            </div>
+          </div>
+          <a href="startup-detail.html" class="w-full block text-center bg-indigo-600/20 hover:bg-indigo-600 border border-indigo-500/30 hover:border-indigo-500 text-indigo-300 hover:text-white font-semibold py-2.5 rounded-xl text-sm transition-all">
+            View Campaign
+          </a>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="text-center mt-12">
+      <a href="browse.html" class="border border-indigo-500/40 hover:border-indigo-400 text-indigo-400 hover:text-indigo-300 font-semibold px-8 py-3 rounded-xl text-sm transition-all inline-block">
+        View All Campaigns →
+      </a>
+    </div>
+  </section>
+
+  <!-- ======================== HOW IT WORKS ======================== -->
+  <section id="how" class="py-24 px-6 bg-[#0f0f2e]/50 border-y border-indigo-500/10">
+    <div class="max-w-5xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-100 mb-4">How StarFund Works</h2>
+      <p class="text-slate-400 text-lg mb-16">Three simple steps to fund or launch your dream.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="flex flex-col items-center text-center">
+          <div class="w-16 h-16 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl flex items-center justify-center text-2xl mb-5">🔍</div>
+          <h3 class="text-lg font-bold text-slate-100 mb-3">1. Browse & Discover</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Explore hundreds of vetted Ethiopian startups across AgriTech, FinTech, HealthTech, and more.</p>
+        </div>
+        <div class="flex flex-col items-center text-center">
+          <div class="w-16 h-16 bg-purple-600/20 border border-purple-500/30 rounded-2xl flex items-center justify-center text-2xl mb-5">💰</div>
+          <h3 class="text-lg font-bold text-slate-100 mb-3">2. Invest Securely</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Choose your investment amount, review the business plan, and invest securely through our escrow-backed platform.</p>
+        </div>
+        <div class="flex flex-col items-center text-center">
+          <div class="w-16 h-16 bg-cyan-600/20 border border-cyan-500/30 rounded-2xl flex items-center justify-center text-2xl mb-5">📈</div>
+          <h3 class="text-lg font-bold text-slate-100 mb-3">3. Track & Grow</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Follow your portfolio, receive quarterly updates from founders, and celebrate when your startups succeed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================== CTA ======================== -->
+  <section class="py-24 px-6 text-center">
+    <div class="max-w-2xl mx-auto bg-gradient-to-br from-indigo-600/10 to-purple-600/10 border border-indigo-500/20 rounded-3xl p-14">
+      <h2 class="text-3xl md:text-4xl font-bold text-slate-100 mb-4">Ready to Get Started?</h2>
+      <p class="text-slate-400 mb-10">Join thousands of Ethiopians already building the future together.</p>
+      <a href="register.html" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-10 py-4 rounded-xl text-base transition-all hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/25 inline-block">
+        Create Free Account →
+      </a>
+    </div>
+  </section>
+
+  <!-- ======================== FOOTER ======================== -->
+  <footer class="border-t border-indigo-500/15 py-10 px-6 text-center">
+    <div class="text-xl font-black gradient-text mb-3">⭐ StarFund</div>
+    <p class="text-slate-500 text-sm mb-6">Empowering Ethiopian entrepreneurs since 2024.</p>
+    <div class="flex justify-center gap-8">
+      <a href="landing.html" class="text-slate-500 hover:text-slate-300 text-sm transition-colors">Home</a>
+      <a href="browse.html" class="text-slate-500 hover:text-slate-300 text-sm transition-colors">Browse</a>
+      <a href="login.html" class="text-slate-500 hover:text-slate-300 text-sm transition-colors">Sign In</a>
+      <a href="register.html" class="text-slate-500 hover:text-slate-300 text-sm transition-colors">Register</a>
+    </div>
+    <p class="text-slate-600 text-xs mt-6">© 2024 StarFund. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
