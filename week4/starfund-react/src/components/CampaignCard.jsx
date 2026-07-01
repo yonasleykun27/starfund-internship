@@ -1,7 +1,9 @@
 import React from 'react';
+import Badge from './Badge';
+import ProgressBar from './ProgressBar';
 
 const CampaignCard = ({ startup }) => {
-  const { name, sector, raised, goal, backers, image, tag } = startup;
+  const { name, sector, raised, goal, backers, image, tag, status } = startup;
   
   // Calculate percentage dynamically
   const percentage = Math.min(Math.round((raised / goal) * 100), 100);
@@ -27,10 +29,14 @@ const CampaignCard = ({ startup }) => {
       </div>
 
       <div className="p-6 flex flex-col flex-1 gap-4">
-        {/* Category & Title */}
-        <div>
-          <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">{sector}</span>
-          <h3 className="text-lg font-extrabold text-white mt-1 leading-snug">{name}</h3>
+        {/* Category, Title, and Status Badge */}
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <span className="text-[10px] font-bold text-amber-500 uppercase tracking-widest">{sector}</span>
+            <h3 className="text-lg font-extrabold text-white mt-1 leading-snug">{name}</h3>
+          </div>
+          {/* Day 18: Render composed status badge */}
+          <Badge status={status} />
         </div>
 
         {/* Funding statistics */}
@@ -39,12 +45,8 @@ const CampaignCard = ({ startup }) => {
             <span className="font-semibold text-white">${raised.toLocaleString()} raised</span>
             <span>{percentage}% of ${goal.toLocaleString()}</span>
           </div>
-          <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
-            <div 
-              className="h-full bg-amber-400 rounded-full transition-all duration-500" 
-              style={{ width: `${percentage}%` }}
-            />
-          </div>
+          {/* Day 18: Render composed progress bar */}
+          <ProgressBar percentage={percentage} />
         </div>
 
         {/* Backers footer */}
