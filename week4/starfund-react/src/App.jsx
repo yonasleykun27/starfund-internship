@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Hero from './components/Hero';
 import FundingProgress from './components/FundingProgress';
 import FollowButton from './components/FollowButton';
 import BrowsePage from './components/BrowsePage';
+import FilterableList from './components/FilterableList';
+import DarkModeToggle from './components/DarkModeToggle';
 import './App.css';
 
-// Mock startup data for Day 18 (5 startups to display and search)
+// ─── Shared Mock Data (single source for all days) ───────────────────────────
 const MOCK_STARTUPS = [
   {
     id: 1,
@@ -16,7 +18,7 @@ const MOCK_STARTUPS = [
     backers: 312,
     image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80',
     tag: 'Trending',
-    status: 'active'
+    status: 'active',
   },
   {
     id: 2,
@@ -27,7 +29,7 @@ const MOCK_STARTUPS = [
     backers: 1205,
     image: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=600&q=80',
     tag: 'Fully Funded',
-    status: 'funded'
+    status: 'funded',
   },
   {
     id: 3,
@@ -38,7 +40,7 @@ const MOCK_STARTUPS = [
     backers: 174,
     image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80',
     tag: 'New',
-    status: 'pending'
+    status: 'pending',
   },
   {
     id: 4,
@@ -49,7 +51,7 @@ const MOCK_STARTUPS = [
     backers: 89,
     image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80',
     tag: 'Eco-Friendly',
-    status: 'active'
+    status: 'active',
   },
   {
     id: 5,
@@ -60,37 +62,65 @@ const MOCK_STARTUPS = [
     backers: 42,
     image: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
     tag: 'Rejected Offer',
-    status: 'rejected'
-  }
+    status: 'rejected',
+  },
 ];
 
+// ─── App (root component) ────────────────────────────────────────────────────
 function App() {
+  // Exercise 19: dark mode state owned here — passed as props down to DarkModeToggle
+  const [isDark, setIsDark] = useState(true);
+
+  // Theme tokens: switch background/text based on isDark state
+  const theme = {
+    bg: isDark ? 'bg-slate-950' : 'bg-slate-100',
+    text: isDark ? 'text-slate-100' : 'text-slate-900',
+  };
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-6 sm:p-12">
-      <div className="max-w-6xl mx-auto">
-        {/* Day 16: Render Hero component */}
-        <Hero 
-          heading="Back the ventures that matter most." 
-          subheading="StarFund connects growth-stage founders with a curated network of impact-driven investors. Start supporting sustainable projects today." 
+    // Conditional class name: dark or light background applied at root
+    <div className={`min-h-screen ${theme.bg} ${theme.text} font-sans transition-colors duration-300`}>
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 py-6">
+
+        {/* ── Dark Mode Toggle bar (Exercise 19) ────────────────────────── */}
+        <div className="flex justify-end mb-6">
+          {/* Pass isDark state and onToggle callback as props */}
+          <DarkModeToggle
+            isDark={isDark}
+            onToggle={() => setIsDark((prev) => !prev)}
+          />
+        </div>
+
+        {/* ── Day 16: Hero component ─────────────────────────────────────── */}
+        <Hero
+          heading="Back the ventures that matter most."
+          subheading="StarFund connects growth-stage founders with a curated network of impact-driven investors. Start supporting sustainable projects today."
         />
 
-        {/* Day 17: Interactive State Demos */}
+        {/* ── Day 17: useState Demos ─────────────────────────────────────── */}
         <div className="mb-12">
-          <div className="border-b border-slate-800 pb-3 mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">Day 17: State & Interaction Demos</h2>
-            <p className="text-sm text-slate-400 mt-1">Testing React useState hooks on isolated components</p>
+          <div className={`border-b pb-3 mb-6 ${isDark ? 'border-slate-800' : 'border-slate-300'}`}>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
+              Day 17: State &amp; Interaction Demos
+            </h2>
+            <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+              Testing React useState hooks on isolated components
+            </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             <FundingProgress goal={500000} initialRaised={345000} />
             <FollowButton initialFollowers={1458} />
           </div>
         </div>
 
-        {/* Day 18: Composed Browse Page */}
+        {/* ── Day 18: Composed Browse Page ───────────────────────────────── */}
         <div className="mb-8">
           <BrowsePage startups={MOCK_STARTUPS} />
         </div>
+
+        {/* ── Day 19: Filterable List with Keys & Conditional Rendering ──── */}
+        <FilterableList startups={MOCK_STARTUPS} />
+
       </div>
     </div>
   );
