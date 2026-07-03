@@ -40,7 +40,7 @@ const StartupDetailPage = ({ startupId = 1 }) => {
             alt={name}
             className="w-full h-full object-cover opacity-80"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-slate-900 via-slate-900/40 to-transparent" />
           <div className="absolute bottom-6 left-6">
             <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">{sector}</span>
             <h1 className="text-3xl font-black text-white mt-1">{name}</h1>
