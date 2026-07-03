@@ -1,127 +1,247 @@
 import React, { useState } from 'react';
-import Hero from './components/Hero';
+
+// ── Pages (Day 20 — 5 StarFund pages, each in /src/pages/) ───────────────────
+import LandingPage from './pages/LandingPage';
+import BrowsePageView from './pages/BrowsePageView';
+import StartupDetailPage from './pages/StartupDetailPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+
+// ── Shared components ─────────────────────────────────────────────────────────
+import DarkModeToggle from './components/DarkModeToggle';
 import FundingProgress from './components/FundingProgress';
 import FollowButton from './components/FollowButton';
-import BrowsePage from './components/BrowsePage';
-import FilterableList from './components/FilterableList';
-import DarkModeToggle from './components/DarkModeToggle';
+import Table from './components/Table';
+import Modal from './components/Modal';
+import Toast from './components/Toast';
+import MultiStepForm from './components/MultiStepForm';
+import Button from './components/Button';
+import Badge from './components/Badge';
+
+// ── Data from single source of truth (Day 20) ─────────────────────────────────
+import { MOCK_STARTUPS } from './data/mockData';
+
 import './App.css';
 
-// ─── Shared Mock Data (single source for all days) ───────────────────────────
-const MOCK_STARTUPS = [
-  {
-    id: 1,
-    name: 'AgroSense AI',
-    sector: 'AgriTech',
-    raised: 184000,
-    goal: 250000,
-    backers: 312,
-    image: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80',
-    tag: 'Trending',
-    status: 'active',
-  },
-  {
-    id: 2,
-    name: 'Hawassa Solar Grid',
-    sector: 'Clean Energy',
-    raised: 800000,
-    goal: 800000,
-    backers: 1205,
-    image: 'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?auto=format&fit=crop&w=600&q=80',
-    tag: 'Fully Funded',
-    status: 'funded',
-  },
-  {
-    id: 3,
-    name: 'MedLink Telemedicine',
-    sector: 'HealthTech',
-    raised: 95000,
-    goal: 300000,
-    backers: 174,
-    image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=600&q=80',
-    tag: 'New',
-    status: 'pending',
-  },
-  {
-    id: 4,
-    name: 'EthioLoop Recycling',
-    sector: 'Clean Energy',
-    raised: 45000,
-    goal: 100000,
-    backers: 89,
-    image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=600&q=80',
-    tag: 'Eco-Friendly',
-    status: 'active',
-  },
-  {
-    id: 5,
-    name: 'SafariGo Logistics',
-    sector: 'Logistics',
-    raised: 12000,
-    goal: 150000,
-    backers: 42,
-    image: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80',
-    tag: 'Rejected Offer',
-    status: 'rejected',
-  },
+// ─── Navigation pages ─────────────────────────────────────────────────────────
+const PAGES = [
+  { id: 'landing',   label: '🏠 Home' },
+  { id: 'browse',    label: '🔍 Browse' },
+  { id: 'detail',    label: '📋 Detail' },
+  { id: 'login',     label: '🔑 Login' },
+  { id: 'register',  label: '📝 Register' },
+  { id: 'exercises', label: '🧪 Exercises' },
 ];
 
-// ─── App (root component) ────────────────────────────────────────────────────
+// ─── App root ─────────────────────────────────────────────────────────────────
 function App() {
-  // Exercise 19: dark mode state owned here — passed as props down to DarkModeToggle
+  // Theme state — lifted to root (Exercise 19)
   const [isDark, setIsDark] = useState(true);
 
-  // Theme tokens: switch background/text based on isDark state
+  // Page navigation state (simulates routing — real router added Week 5)
+  const [activePage, setActivePage] = useState('landing');
+
+  // Modal state (Exercise 17)
+  const [modalOpen, setModalOpen] = useState(false);
+
+  // Toast state (Exercise 18)
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastType, setToastType] = useState('success');
+
   const theme = {
     bg: isDark ? 'bg-slate-950' : 'bg-slate-100',
     text: isDark ? 'text-slate-100' : 'text-slate-900',
+    nav: isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200',
+    navItem: isDark
+      ? 'text-slate-400 hover:text-white hover:bg-slate-800'
+      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100',
+    navItemActive: isDark
+      ? 'text-amber-400 bg-amber-400/10 border-b-2 border-amber-400'
+      : 'text-amber-600 bg-amber-50 border-b-2 border-amber-500',
+  };
+
+  const showToast = (type) => {
+    setToastType(type);
+    setToastVisible(true);
   };
 
   return (
-    // Conditional class name: dark or light background applied at root
     <div className={`min-h-screen ${theme.bg} ${theme.text} font-sans transition-colors duration-300`}>
-      <div className="max-w-6xl mx-auto px-6 sm:px-12 py-6">
 
-        {/* ── Dark Mode Toggle bar (Exercise 19) ────────────────────────── */}
-        <div className="flex justify-end mb-6">
-          {/* Pass isDark state and onToggle callback as props */}
-          <DarkModeToggle
-            isDark={isDark}
-            onToggle={() => setIsDark((prev) => !prev)}
-          />
-        </div>
+      {/* ── Top navigation bar ───────────────────────────────────────────────── */}
+      <nav className={`sticky top-0 z-40 border-b ${theme.nav} shadow-sm`}>
+        <div className="max-w-6xl mx-auto px-4 flex items-center justify-between gap-2">
 
-        {/* ── Day 16: Hero component ─────────────────────────────────────── */}
-        <Hero
-          heading="Back the ventures that matter most."
-          subheading="StarFund connects growth-stage founders with a curated network of impact-driven investors. Start supporting sustainable projects today."
-        />
-
-        {/* ── Day 17: useState Demos ─────────────────────────────────────── */}
-        <div className="mb-12">
-          <div className={`border-b pb-3 mb-6 ${isDark ? 'border-slate-800' : 'border-slate-300'}`}>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight">
-              Day 17: State &amp; Interaction Demos
-            </h2>
-            <p className={`text-sm mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-              Testing React useState hooks on isolated components
-            </p>
+          {/* Logo */}
+          <div className="flex items-center gap-2 py-3 shrink-0">
+            <span className="text-amber-400 font-black text-lg tracking-tight">⭐ StarFund</span>
+            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${isDark ? 'bg-amber-400/10 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>Week 4</span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            <FundingProgress goal={500000} initialRaised={345000} />
-            <FollowButton initialFollowers={1458} />
+
+          {/* Page tabs — scrollable on mobile */}
+          <div className="flex overflow-x-auto hide-scrollbar flex-1 min-w-0">
+            {PAGES.map((page) => (
+              <button
+                key={page.id}
+                id={`nav-${page.id}`}
+                onClick={() => setActivePage(page.id)}
+                className={`
+                  px-3 py-4 text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer
+                  ${activePage === page.id ? theme.navItemActive : theme.navItem}
+                `}
+              >
+                {page.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Dark mode toggle */}
+          <div className="shrink-0">
+            <DarkModeToggle isDark={isDark} onToggle={() => setIsDark((p) => !p)} />
           </div>
         </div>
+      </nav>
 
-        {/* ── Day 18: Composed Browse Page ───────────────────────────────── */}
-        <div className="mb-8">
-          <BrowsePage startups={MOCK_STARTUPS} />
-        </div>
+      {/* ── Page content ─────────────────────────────────────────────────────── */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
 
-        {/* ── Day 19: Filterable List with Keys & Conditional Rendering ──── */}
-        <FilterableList startups={MOCK_STARTUPS} />
+        {activePage === 'landing'   && <LandingPage />}
+        {activePage === 'browse'    && <BrowsePageView />}
+        {activePage === 'detail'    && <StartupDetailPage startupId={1} />}
+        {activePage === 'login'     && <LoginPage />}
+        {activePage === 'register'  && <RegisterPage />}
 
-      </div>
+        {/* ── Exercises page ─────────────────────────────────────────────── */}
+        {activePage === 'exercises' && (
+          <div className="space-y-16">
+
+            {/* Header */}
+            <div className="text-center pt-4">
+              <h1 className="text-4xl font-black tracking-tight">Week 4 Exercises</h1>
+              <p className={`mt-2 text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Exercises 16–20 — all built and demonstrated below
+              </p>
+            </div>
+
+            {/* ── Exercise 16 — Table ──────────────────────────────────────── */}
+            <section id="exercise-16">
+              <h2 className="text-xl font-bold mb-1">Exercise 16 — Reusable &lt;Table /&gt;</h2>
+              <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Generic table component that accepts <code className="text-amber-400">headers</code> and <code className="text-amber-400">rows</code> props.
+              </p>
+              <Table
+                caption="StarFund — Campaign Overview"
+                headers={['Startup', 'Sector', 'Raised', 'Goal', 'Backers', 'Status']}
+                rows={MOCK_STARTUPS.map((s) => [
+                  s.name,
+                  s.sector,
+                  `$${s.raised.toLocaleString()}`,
+                  `$${s.goal.toLocaleString()}`,
+                  s.backers,
+                  <Badge key={s.id} status={s.status} />,
+                ])}
+              />
+            </section>
+
+            {/* ── Exercise 17 — Modal ──────────────────────────────────────── */}
+            <section id="exercise-17">
+              <h2 className="text-xl font-bold mb-1">Exercise 17 — &lt;Modal /&gt;</h2>
+              <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Open/close with <code className="text-amber-400">useState</code>. Accepts any children. Click backdrop or X to close.
+              </p>
+              <Button id="open-modal-btn" variant="primary" onClick={() => setModalOpen(true)}>
+                Open Modal
+              </Button>
+              <Modal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                title="Invest in AgroSense AI 🌱"
+              >
+                <div className="space-y-4">
+                  <p className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                    Choose your investment amount and confirm your backing of this campaign.
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['$500', '$1,000', '$5,000'].map((amt) => (
+                      <button
+                        key={amt}
+                        className="py-2 rounded-xl border border-slate-700 text-sm font-semibold text-slate-300 hover:border-amber-400 hover:text-amber-400 transition-all"
+                      >
+                        {amt}
+                      </button>
+                    ))}
+                  </div>
+                  <Button variant="primary" fullWidth onClick={() => setModalOpen(false)}>
+                    Confirm Investment
+                  </Button>
+                </div>
+              </Modal>
+            </section>
+
+            {/* ── Exercise 18 — Toast ──────────────────────────────────────── */}
+            <section id="exercise-18">
+              <h2 className="text-xl font-bold mb-1">Exercise 18 — &lt;Toast /&gt;</h2>
+              <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Auto-dismisses after 3 seconds. Supports 4 types. Click a button to trigger.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {(['success', 'error', 'info', 'warning']).map((t) => (
+                  <Button key={t} variant="outline" onClick={() => showToast(t)} className="capitalize">
+                    {t === 'success' ? '✅' : t === 'error' ? '❌' : t === 'info' ? 'ℹ️' : '⚠️'} {t}
+                  </Button>
+                ))}
+              </div>
+              <Toast
+                message={
+                  toastType === 'success' ? 'Investment confirmed! 🎉' :
+                  toastType === 'error'   ? 'Something went wrong. Please try again.' :
+                  toastType === 'info'    ? 'Tip: You can filter campaigns by status.' :
+                                           'Campaign deadline is in 3 days!'
+                }
+                type={toastType}
+                isVisible={toastVisible}
+                onDismiss={() => setToastVisible(false)}
+                duration={3000}
+              />
+            </section>
+
+            {/* ── Exercise 19 — Dark mode (done) ──────────────────────────── */}
+            <section id="exercise-19">
+              <h2 className="text-xl font-bold mb-1">Exercise 19 — Dark Mode Toggle ✅</h2>
+              <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Already complete! The toggle in the top-right nav bar controls the entire app theme. State lives in App (root) and is passed down as props.
+              </p>
+            </section>
+
+            {/* ── Exercise 20 — Multi-step form ────────────────────────────── */}
+            <section id="exercise-20">
+              <h2 className="text-xl font-bold mb-1">Exercise 20 — Multi-Step Form</h2>
+              <p className={`text-sm mb-4 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                3-step registration form using <code className="text-amber-400">useState</code> to track current step and form data.
+              </p>
+              <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6">
+                <MultiStepForm />
+              </div>
+            </section>
+
+            {/* ── Day 17 Demos (kept for continuity) ──────────────────────── */}
+            <section id="day17-demos">
+              <h2 className="text-xl font-bold mb-4">Day 17 — State Demos</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <FundingProgress goal={500000} initialRaised={345000} />
+                <FollowButton initialFollowers={1458} />
+              </div>
+            </section>
+
+          </div>
+        )}
+
+      </main>
+
+      {/* ── Footer ───────────────────────────────────────────────────────────── */}
+      <footer className={`border-t mt-16 py-6 text-center text-xs ${isDark ? 'border-slate-800 text-slate-600' : 'border-slate-200 text-slate-400'}`}>
+        StarFund Internship · Week 4 · React Fundamentals · Days 16–20
+      </footer>
     </div>
   );
 }
