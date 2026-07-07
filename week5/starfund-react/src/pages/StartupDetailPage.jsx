@@ -1,27 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MOCK_STARTUPS } from '../data/mockData';
 import Badge from '../components/Badge';
 import ProgressBar from '../components/ProgressBar';
 import Button from '../components/Button';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 // ─── StartupDetailPage ────────────────────────────────────────────────────────
 //
-// Day 21 — Startup detail page reading :id parameter from path.
+// Day 22 — Startup detail page demonstrating async simulated data fetching with useEffect.
 
 const StartupDetailPage = () => {
   const { id } = useParams();
-  
-  // Find the startup by id from mockData — single source of truth
-  const startup = MOCK_STARTUPS.find((s) => s.id === parseInt(id || '1', 10));
+  const [startup, setStartup] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Conditional rendering: if id not found, show error state
-  if (!startup) {
+  useEffect(() => {
+    // Reset state on ID change
+    setLoading(true);
+    setError(null);
+    setStartup(null);
+
+    // Simulate async API call with 1-second delay
+    const timer = setTimeout(() => {
+      const parsedId = parseInt(id || '1', 10);
+      const found = MOCK_STARTUPS.find((s) => s.id === parsedId);
+
+      if (found) {
+        setStartup(found);
+      } else {
+        setError(`No startup with id #${id} exists in our database.`);
+      }
+      setLoading(false);
+    }, 1000);
+
+    // Cleanup function: cancel timer if component unmounts or ID changes
+    return () => clearTimeout(timer);
+  }, [id]);
+
+  // 1. Loading State rendering
+  if (loading) {
+    return <LoadingSpinner message="Retrieving campaign specifications..." />;
+  }
+
+  // 2. Error State rendering
+  if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 text-center space-y-4">
+      <div className="flex flex-col items-center justify-center py-24 text-center space-y-4 animate-[fadeIn_0.3s_ease]">
         <div className="text-6xl">🔍</div>
         <h2 className="text-2xl font-bold text-white">Startup not found</h2>
-        <p className="text-slate-400">No startup with id #{id} exists in our database.</p>
+        <p className="text-slate-400">{error}</p>
         <Link to="/browse">
           <Button variant="outline" size="sm">
             ← Back to Campaigns
