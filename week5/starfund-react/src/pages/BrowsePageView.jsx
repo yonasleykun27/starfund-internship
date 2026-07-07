@@ -1,17 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BrowsePage from '../components/BrowsePage';
 import FilterableList from '../components/FilterableList';
+import LoadingSpinner from '../components/LoadingSpinner';
 import { MOCK_STARTUPS } from '../data/mockData';
 
 // ─── BrowsePageView ───────────────────────────────────────────────────────────
 //
-// Day 20 — Page 2 of 5 StarFund pages
-// Wraps the Browse section components (BrowsePage + FilterableList).
-// Data comes from mockData.js — not hardcoded here.
+// Day 22 — Browse page view demonstrating simulated async data loading with useEffect.
 
 const BrowsePageView = () => {
+  const [startups, setStartups] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Reset state on mount
+    setLoading(true);
+    setError(null);
+
+    // Simulate async network request
+    const timer = setTimeout(() => {
+      try {
+        setStartups(MOCK_STARTUPS);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch campaigns. Please refresh.');
+        setLoading(false);
+      }
+    }, 1000);
+
+    // Cleanup: cancel the async timer
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingSpinner message="Loading investment opportunities..." />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center space-y-3">
+        <div className="text-5xl">⚠️</div>
+        <h2 className="text-xl font-bold text-white">Error loading campaigns</h2>
+        <p className="text-slate-400 text-sm">{error}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 animate-[fadeIn_0.3s_ease]">
       {/* Section header */}
       <div className="text-center pt-6">
         <h1 className="text-4xl font-black text-white tracking-tight">
@@ -23,12 +60,13 @@ const BrowsePageView = () => {
       </div>
 
       {/* BrowsePage (Day 18 — composed component) */}
-      <BrowsePage startups={MOCK_STARTUPS} />
+      <BrowsePage startups={startups} />
 
       {/* FilterableList (Day 19 — lists, keys, conditional rendering) */}
-      <FilterableList startups={MOCK_STARTUPS} />
+      <FilterableList startups={startups} />
     </div>
   );
 };
 
 export default BrowsePageView;
+
