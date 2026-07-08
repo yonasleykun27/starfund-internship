@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import FounderDashboard from './pages/FounderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import CreateStartupPage from './pages/CreateStartupPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // ── Shared components ─────────────────────────────────────────────────────────
@@ -113,6 +114,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/founder/dashboard" element={<FounderDashboard />} />
+          <Route path="/founder/create-startup" element={<CreateStartupPage />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           {/* ── Exercises Route (Exercise 16-20) ─────────────────────────── */}
