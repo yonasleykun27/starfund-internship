@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import useForm from '../hooks/useForm';
+import { useAuth } from '../context/AuthContext';
 
 // ─── RegisterPage ─────────────────────────────────────────────────────────────
 //
-// Day 23 — Register Page with Form validation
-// Fully implements Day 23 validation rules for Register form:
-// required, email format, password >= 8 characters, password confirmation matching.
+// Day 24 — Register Page refactored to use useForm and useAuth
 
 const ROLES = [
   { value: 'investor', label: '💰 Investor', desc: 'Browse and back startups' },
@@ -16,99 +16,51 @@ const ROLES = [
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
+  const { login } = useAuth();
+  const [submitted, setSubmitted] = useState(false);
+
+  const validate = (formValues) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let tempErrors = {};
+    
+    if (!formValues.name.trim()) tempErrors.name = 'Full name is required';
+    
+    if (!formValues.email) {
+      tempErrors.email = 'Email address is required';
+    } else if (!emailRegex.test(formValues.email)) {
+      tempErrors.email = 'Invalid email address format';
+    }
+    
+    if (!formValues.password) {
+      tempErrors.password = 'Password is required';
+    } else if (formValues.password.length < 8) {
+      tempErrors.password = 'Password must be at least 8 characters';
+    }
+    
+    if (!formValues.confirmPassword) {
+      tempErrors.confirmPassword = 'Confirm password is required';
+    } else if (formValues.confirmPassword !== formValues.password) {
+      tempErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    return tempErrors;
+  };
+
+  const { values, errors, handleChange, handleBlur, handleSubmit, setValues } = useForm({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
     role: 'investor',
-  });
-  
-  const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  }, validate);
 
-  const validateField = (name, value) => {
-    let errorMsg = '';
-    
-    if (name === 'name') {
-      if (!value.trim()) errorMsg = 'Full name is required';
-    }
-    
-    if (name === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!value) {
-        errorMsg = 'Email address is required';
-      } else if (!emailRegex.test(value)) {
-        errorMsg = 'Invalid email address format';
-      }
-    }
-    
-    if (name === 'password') {
-      if (!value) {
-        errorMsg = 'Password is required';
-      } else if (value.length < 8) {
-        errorMsg = 'Password must be at least 8 characters';
-      }
-    }
-    
-    if (name === 'confirmPassword') {
-      if (!value) {
-        errorMsg = 'Confirm password is required';
-      } else if (value !== form.password) {
-        errorMsg = 'Passwords do not match';
-      }
-    }
-    
-    setErrors((prev) => ({ ...prev, [name]: errorMsg }));
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    // Clear error message when user starts typing again
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    validateField(name, value);
-  };
-
-  const validateAll = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    let tempErrors = {};
-    
-    if (!form.name.trim()) tempErrors.name = 'Full name is required';
-    
-    if (!form.email) {
-      tempErrors.email = 'Email address is required';
-    } else if (!emailRegex.test(form.email)) {
-      tempErrors.email = 'Invalid email address format';
-    }
-    
-    if (!form.password) {
-      tempErrors.password = 'Password is required';
-    } else if (form.password.length < 8) {
-      tempErrors.password = 'Password must be at least 8 characters';
-    }
-    
-    if (!form.confirmPassword) {
-      tempErrors.confirmPassword = 'Confirm password is required';
-    } else if (form.confirmPassword !== form.password) {
-      tempErrors.confirmPassword = 'Passwords do not match';
-    }
-    
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).every((key) => !tempErrors[key]);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateAll()) {
-      setSubmitted(true);
-    }
+  const handleRegister = (formValues) => {
+    login({
+      name: formValues.name,
+      email: formValues.email,
+      role: formValues.role,
+    });
+    setSubmitted(true);
   };
 
   return (
@@ -130,14 +82,14 @@ const RegisterPage = () => {
               Account created successfully!
             </p>
             <p className="text-slate-400 text-xs">
-              Welcome, {form.name} — role: {form.role}
+              Welcome, {values.name} — role: {values.role}
             </p>
             <Button variant="outline" size="sm" onClick={() => navigate('/login')} className="mt-2">
               Go to Sign In
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <form onSubmit={handleSubmit(handleRegister)} className="space-y-4" noValidate>
 
             {/* Role selector */}
             <div className="space-y-2">
@@ -146,12 +98,12 @@ const RegisterPage = () => {
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {ROLES.map((r) => {
-                  const isActive = form.role === r.value;
+                  const isActive = values.role === r.value;
                   return (
                     <button
                       key={r.value}
                       type="button"
-                      onClick={() => setForm((prev) => ({ ...prev, role: r.value }))}
+                      onClick={() => setValues((prev) => ({ ...prev, role: r.value }))}
                       className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
                         isActive
                           ? 'bg-amber-400/10 border-amber-400/50 text-amber-400'
@@ -174,7 +126,7 @@ const RegisterPage = () => {
               type="text"
               name="name"
               placeholder="Yonas Leykun"
-              value={form.name}
+              value={values.name}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.name}
@@ -186,7 +138,7 @@ const RegisterPage = () => {
               type="email"
               name="email"
               placeholder="you@example.com"
-              value={form.email}
+              value={values.email}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.email}
@@ -198,7 +150,7 @@ const RegisterPage = () => {
               type="password"
               name="password"
               placeholder="Min 8 characters"
-              value={form.password}
+              value={values.password}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.password}
@@ -210,7 +162,7 @@ const RegisterPage = () => {
               type="password"
               name="confirmPassword"
               placeholder="Repeat password"
-              value={form.confirmPassword}
+              value={values.confirmPassword}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.confirmPassword}

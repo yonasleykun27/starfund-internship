@@ -2,75 +2,59 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import useForm from '../hooks/useForm';
+import { useAuth } from '../context/AuthContext';
 
 // ─── LoginPage ────────────────────────────────────────────────────────────────
 //
-// Day 23 — Login Page with Validation
-// Fully implements Day 23 validation rules for Login form.
+// Day 24 — Login Page refactored with useForm and useAuth
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [errors, setErrors] = useState({});
+  const { login } = useAuth();
   const [submitted, setSubmitted] = useState(false);
 
-  const validateField = (name, value) => {
-    let errorMsg = '';
-    
-    if (name === 'email') {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!value) {
-        errorMsg = 'Email address is required';
-      } else if (!emailRegex.test(value)) {
-        errorMsg = 'Invalid email address format';
-      }
-    }
-    
-    if (name === 'password') {
-      if (!value) {
-        errorMsg = 'Password is required';
-      }
-    }
-    
-    setErrors((prev) => ({ ...prev, [name]: errorMsg }));
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    validateField(name, value);
-  };
-
-  const validateAll = () => {
+  const validate = (formValues) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let tempErrors = {};
     
-    if (!form.email) {
+    if (!formValues.email) {
       tempErrors.email = 'Email address is required';
-    } else if (!emailRegex.test(form.email)) {
+    } else if (!emailRegex.test(formValues.email)) {
       tempErrors.email = 'Invalid email address format';
     }
     
-    if (!form.password) {
+    if (!formValues.password) {
       tempErrors.password = 'Password is required';
     }
     
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).every((key) => !tempErrors[key]);
+    return tempErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateAll()) {
-      setSubmitted(true);
+  const { values, errors, handleChange, handleBlur, handleSubmit } = useForm({
+    email: '',
+    password: '',
+  }, validate);
+
+  const handleLogin = (formValues) => {
+    // Check email to mock roles for testing
+    let name = 'Demo User';
+    let role = 'investor';
+    
+    if (formValues.email.toLowerCase().includes('admin')) {
+      name = 'StarFund Admin';
+      role = 'admin';
+    } else if (formValues.email.toLowerCase().includes('founder')) {
+      name = 'StarFund Founder';
+      role = 'founder';
     }
+    
+    login({
+      name,
+      email: formValues.email,
+      role,
+    });
+    setSubmitted(true);
   };
 
   return (
@@ -91,20 +75,20 @@ const LoginPage = () => {
             <p className="text-green-400 font-semibold text-sm">
               Login submitted successfully!
             </p>
-            <p className="text-slate-400 text-xs">Email: {form.email}</p>
-            <Button variant="outline" size="sm" onClick={() => navigate('/founder/dashboard')} className="mt-2">
+            <p className="text-slate-400 text-xs">Email: {values.email}</p>
+            <Button variant="outline" size="sm" onClick={() => navigate(values.email.toLowerCase().includes('admin') ? '/admin/dashboard' : '/founder/dashboard')} className="mt-2 cursor-pointer">
               Go to Dashboard
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <form onSubmit={handleSubmit(handleLogin)} className="space-y-4" noValidate>
             <Input
               id="login-email"
               label="Email address"
               type="email"
               name="email"
               placeholder="you@example.com"
-              value={form.email}
+              value={values.email}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.email}
@@ -116,7 +100,7 @@ const LoginPage = () => {
               type="password"
               name="password"
               placeholder="••••••••"
-              value={form.password}
+              value={values.password}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.password}

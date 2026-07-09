@@ -2,116 +2,58 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import useForm from '../hooks/useForm';
 
 // ─── CreateStartupPage ────────────────────────────────────────────────────────
 //
-// Day 23 — Create Startup form (for founders) with validations.
-// Title, description, sector (dropdown), cover image URL, team size.
+// Day 24 — Refactored Create Startup page utilizing custom useForm hook
 
 const SECTORS = ['Technology', 'Agriculture', 'Healthcare', 'Education', 'FinTech', 'Energy'];
 
 const CreateStartupPage = () => {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    title: '',
-    description: '',
-    sector: '',
-    coverUrl: '',
-    teamSize: '',
-  });
-
-  const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
-  const validateField = (name, value) => {
-    let errorMsg = '';
-
-    if (name === 'title') {
-      if (!value.trim()) errorMsg = 'Startup title is required';
-    }
-
-    if (name === 'description') {
-      if (!value.trim()) {
-        errorMsg = 'Description is required';
-      } else if (value.trim().length < 20) {
-        errorMsg = 'Description must be at least 20 characters long';
-      }
-    }
-
-    if (name === 'sector') {
-      if (!value) errorMsg = 'Please select a sector';
-    }
-
-    if (name === 'coverUrl') {
-      const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
-      if (!value) {
-        errorMsg = 'Cover image URL is required';
-      } else if (!urlRegex.test(value)) {
-        errorMsg = 'Please enter a valid image URL';
-      }
-    }
-
-    if (name === 'teamSize') {
-      const num = parseInt(value, 10);
-      if (!value) {
-        errorMsg = 'Team size is required';
-      } else if (isNaN(num) || num <= 0) {
-        errorMsg = 'Team size must be a positive integer';
-      }
-    }
-
-    setErrors((prev) => ({ ...prev, [name]: errorMsg }));
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleBlur = (e) => {
-    const { name, value } = e.target;
-    validateField(name, value);
-  };
-
-  const validateAll = () => {
+  const validate = (formValues) => {
     let tempErrors = {};
     const urlRegex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([\/\w .-]*)*\/?$/;
 
-    if (!form.title.trim()) tempErrors.title = 'Startup title is required';
+    if (!formValues.title.trim()) tempErrors.title = 'Startup title is required';
     
-    if (!form.description.trim()) {
+    if (!formValues.description.trim()) {
       tempErrors.description = 'Description is required';
-    } else if (form.description.trim().length < 20) {
+    } else if (formValues.description.trim().length < 20) {
       tempErrors.description = 'Description must be at least 20 characters long';
     }
 
-    if (!form.sector) tempErrors.sector = 'Please select a sector';
+    if (!formValues.sector) tempErrors.sector = 'Please select a sector';
 
-    if (!form.coverUrl) {
+    if (!formValues.coverUrl) {
       tempErrors.coverUrl = 'Cover image URL is required';
-    } else if (!urlRegex.test(form.coverUrl)) {
+    } else if (!urlRegex.test(formValues.coverUrl)) {
       tempErrors.coverUrl = 'Please enter a valid image URL';
     }
 
-    const teamSizeNum = parseInt(form.teamSize, 10);
-    if (!form.teamSize) {
+    const teamSizeNum = parseInt(formValues.teamSize, 10);
+    if (!formValues.teamSize) {
       tempErrors.teamSize = 'Team size is required';
     } else if (isNaN(teamSizeNum) || teamSizeNum <= 0) {
       tempErrors.teamSize = 'Team size must be a positive integer';
     }
 
-    setErrors(tempErrors);
-    return Object.keys(tempErrors).every((key) => !tempErrors[key]);
+    return tempErrors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateAll()) {
-      setSubmitted(true);
-    }
+  const { values, errors, handleChange, handleBlur, handleSubmit, setValues } = useForm({
+    title: '',
+    description: '',
+    sector: '',
+    coverUrl: '',
+    teamSize: '',
+  }, validate);
+
+  const handleCreate = (formValues) => {
+    setSubmitted(true);
   };
 
   return (
@@ -130,14 +72,14 @@ const CreateStartupPage = () => {
             <div className="text-4xl">🎉</div>
             <p className="text-amber-400 font-bold text-base">Campaign Submitted!</p>
             <p className="text-slate-300 text-xs">
-              Your startup <strong>{form.title}</strong> in the {form.sector} sector has been queued for verification.
+              Your startup <strong>{values.title}</strong> in the {values.sector} sector has been queued for verification.
             </p>
             <Button variant="outline" size="sm" onClick={() => navigate('/founder/dashboard')} className="mt-3 cursor-pointer">
               Go to Founder Dashboard
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+          <form onSubmit={handleSubmit(handleCreate)} className="space-y-5" noValidate>
             
             <Input
               id="startup-title"
@@ -145,7 +87,7 @@ const CreateStartupPage = () => {
               type="text"
               name="title"
               placeholder="e.g. AgroSense AI"
-              value={form.title}
+              value={values.title}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.title}
@@ -161,7 +103,7 @@ const CreateStartupPage = () => {
                 name="description"
                 rows="4"
                 placeholder="What problem does your startup solve? (Minimum 20 characters)"
-                value={form.description}
+                value={values.description}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className={`
@@ -188,7 +130,7 @@ const CreateStartupPage = () => {
                 <select
                   id="startup-sector"
                   name="sector"
-                  value={form.sector}
+                  value={values.sector}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className={`
@@ -217,7 +159,7 @@ const CreateStartupPage = () => {
                 type="number"
                 name="teamSize"
                 placeholder="e.g. 5"
-                value={form.teamSize}
+                value={values.teamSize}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={errors.teamSize}
@@ -231,7 +173,7 @@ const CreateStartupPage = () => {
               type="text"
               name="coverUrl"
               placeholder="https://example.com/image.png"
-              value={form.coverUrl}
+              value={values.coverUrl}
               onChange={handleChange}
               onBlur={handleBlur}
               error={errors.coverUrl}

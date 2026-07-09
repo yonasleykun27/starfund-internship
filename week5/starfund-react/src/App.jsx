@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 
 // ── Pages (Day 20 + Day 21 page views) ────────────────────────────────────────
 import LandingPage from './pages/LandingPage';
@@ -42,6 +43,8 @@ const NAVIGATION = [
 
 // ─── App root ─────────────────────────────────────────────────────────────────
 function App() {
+  const { currentUser, logout } = useAuth();
+
   // Theme state — lifted to root (Exercise 19)
   const [isDark, setIsDark] = useState(true);
 
@@ -69,6 +72,22 @@ function App() {
     setToastVisible(true);
   };
 
+  // Dynamically filter navigation links based on auth state
+  const visibleNav = NAVIGATION.filter((nav) => {
+    if (nav.path === '/login' || nav.path === '/register') {
+      return !currentUser;
+    }
+    // Only show Founder link if logged in as founder
+    if (nav.path === '/founder/dashboard') {
+      return currentUser && currentUser.role === 'founder';
+    }
+    // Only show Admin link if logged in as admin
+    if (nav.path === '/admin/dashboard') {
+      return currentUser && currentUser.role === 'admin';
+    }
+    return true;
+  });
+
   return (
     <div className={`min-h-screen ${theme.bg} ${theme.text} font-sans transition-colors duration-300`}>
 
@@ -84,7 +103,7 @@ function App() {
 
           {/* Page links — scrollable on mobile */}
           <div className="flex overflow-x-auto hide-scrollbar flex-1 min-w-0">
-            {NAVIGATION.map((nav) => (
+            {visibleNav.map((nav) => (
               <NavLink
                 key={nav.path}
                 to={nav.path}
@@ -97,6 +116,27 @@ function App() {
               </NavLink>
             ))}
           </div>
+
+          {/* User profile / Logout widget */}
+          {currentUser && (
+            <div className="flex items-center gap-2 ml-2 shrink-0">
+              <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full border text-left ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-200 border-slate-300'}`}>
+                <div className="w-5 h-5 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-xs">
+                  {currentUser.name[0].toUpperCase()}
+                </div>
+                <div className="hidden md:block">
+                  <p className="text-[10px] font-bold leading-none">{currentUser.name}</p>
+                  <p className="text-[8px] text-slate-500 capitalize leading-none mt-0.5">{currentUser.role}</p>
+                </div>
+              </div>
+              <button
+                onClick={logout}
+                className="px-2 py-1 rounded-lg border border-red-500/30 text-red-400 text-[10px] font-bold hover:bg-red-500/10 transition-all cursor-pointer bg-transparent"
+              >
+                Logout
+              </button>
+            </div>
+          )}
 
           {/* Dark mode toggle */}
           <div className="shrink-0">
