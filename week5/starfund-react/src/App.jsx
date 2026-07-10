@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { useNotifications } from './context/NotificationContext';
+import { useSidebar } from './hooks/useSidebar';
 
 // ── Pages (Day 20 + Day 21 page views) ────────────────────────────────────────
 import LandingPage from './pages/LandingPage';
@@ -23,6 +25,8 @@ import Toast from './components/Toast';
 import MultiStepForm from './components/MultiStepForm';
 import Button from './components/Button';
 import Badge from './components/Badge';
+import ProtectedRoute from './components/ProtectedRoute';
+import RoleRoute from './components/RoleRoute';
 
 // ── Data from single source of truth ──────────────────────────────────────────
 import { MOCK_STARTUPS } from './data/mockData';
@@ -44,6 +48,9 @@ const NAVIGATION = [
 // ─── App root ─────────────────────────────────────────────────────────────────
 function App() {
   const { currentUser, logout } = useAuth();
+  const { notifications, unreadCount, markAllAsRead } = useNotifications();
+  const [bellOpen, setBellOpen] = useState(false);
+  const sidebar = useSidebar();
 
   // Theme state — lifted to root (Exercise 19)
   const [isDark, setIsDark] = useState(true);
@@ -95,14 +102,25 @@ function App() {
       <nav className={`sticky top-0 z-40 border-b ${theme.nav} shadow-sm`}>
         <div className="max-w-6xl mx-auto px-4 flex items-center justify-between gap-2">
 
+          {/* Hamburger button visible only on mobile/tablet */}
+          <button
+            onClick={sidebar.toggle}
+            className={`lg:hidden p-1.5 mr-1 rounded-lg border transition-colors cursor-pointer ${
+              isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-200 border-slate-350 text-slate-700'
+            }`}
+            aria-label="Toggle menu"
+          >
+            ☰
+          </button>
+
           {/* Logo */}
           <div className="flex items-center gap-2 py-3 shrink-0">
             <span className="text-amber-400 font-black text-lg tracking-tight">⭐ StarFund</span>
             <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${isDark ? 'bg-amber-400/10 text-amber-400' : 'bg-amber-100 text-amber-700'}`}>Week 5</span>
           </div>
 
-          {/* Page links — scrollable on mobile */}
-          <div className="flex overflow-x-auto hide-scrollbar flex-1 min-w-0">
+          {/* Page links — hidden on mobile, scrollable on desktop */}
+          <div className="hidden lg:flex overflow-x-auto hide-scrollbar flex-1 min-w-0">
             {visibleNav.map((nav) => (
               <NavLink
                 key={nav.path}
@@ -138,12 +156,102 @@ function App() {
             </div>
           )}
 
+          {/* Notification Bell (Exercise 24) */}
+          <div className="relative shrink-0 mr-1">
+            <button
+              onClick={() => { setBellOpen(!bellOpen); }}
+              className={`p-2 rounded-xl border transition-all cursor-pointer relative ${
+                isDark 
+                  ? 'bg-slate-800 border-slate-700 text-slate-350 hover:text-white' 
+                  : 'bg-white border-slate-300 text-slate-650 hover:text-slate-900'
+              }`}
+              aria-label="Notifications"
+            >
+              <span>🔔</span>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[9px] animate-bounce">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {bellOpen && (
+              <div className={`absolute right-0 mt-2 w-72 rounded-2xl border shadow-2xl p-4 z-50 animate-[fadeIn_0.15s_ease] ${
+                isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              }`}>
+                <div className="flex items-center justify-between border-b pb-2 mb-2 border-slate-800">
+                  <span className="text-xs font-bold">Notifications</span>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={() => { markAllAsRead(); }}
+                      className="text-[10px] text-amber-400 font-bold hover:text-amber-300 bg-transparent cursor-pointer border-0"
+                    >
+                      Mark all as read
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-3 max-h-56 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <p className="text-[10px] text-slate-505 text-center py-4">No notifications yet.</p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div key={n.id} className="text-[10px] leading-tight space-y-0.5 border-b pb-2 last:border-b-0 border-slate-800">
+                        <p className={n.read ? 'text-slate-400' : 'text-white font-semibold'}>{n.text}</p>
+                        <p className="text-[8px] text-slate-500">{n.time}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Dark mode toggle */}
           <div className="shrink-0">
             <DarkModeToggle isDark={isDark} onToggle={() => setIsDark((p) => !p)} />
           </div>
         </div>
       </nav>
+
+      {/* Mobile sidebar overlay (Exercise 25) */}
+      {sidebar.isOpen && (
+        <div 
+          className="fixed inset-0 z-45 bg-slate-950/80 backdrop-blur-sm lg:hidden transition-all duration-300"
+          onClick={sidebar.close}
+        />
+      )}
+
+      {/* Mobile sidebar drawer */}
+      <div className={`fixed inset-y-0 left-0 w-64 z-50 transform transition-transform duration-300 lg:hidden border-r shadow-2xl flex flex-col p-6 space-y-6 ${
+        sidebar.isOpen ? 'translate-x-0' : '-translate-x-full'
+      } ${isDark ? 'bg-slate-900 border-slate-850 text-white' : 'bg-white border-slate-250 text-slate-900'}`}>
+        <div className="flex items-center justify-between border-b pb-4 border-slate-800">
+          <span className="text-amber-400 font-black text-lg tracking-tight">⭐ StarFund</span>
+          <button 
+            onClick={sidebar.close} 
+            className="text-slate-500 hover:text-white p-1 hover:bg-slate-800 rounded-lg cursor-pointer bg-transparent border-0"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="flex flex-col gap-2 flex-1">
+          {visibleNav.map((nav) => (
+            <NavLink
+              key={nav.path}
+              to={nav.path}
+              onClick={sidebar.close}
+              className={({ isActive }) => `
+                px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer
+                ${isActive 
+                  ? (isDark ? 'bg-amber-400/10 text-amber-400 font-bold' : 'bg-amber-50 text-amber-600 font-bold') 
+                  : (isDark ? 'text-slate-400 hover:bg-slate-800 hover:text-white' : 'text-slate-650 hover:bg-slate-100 hover:text-slate-900')}
+              `}
+            >
+              {nav.label}
+            </NavLink>
+          ))}
+        </div>
+      </div>
 
       {/* ── Page content ─────────────────────────────────────────────────────── */}
       <main className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
@@ -153,9 +261,27 @@ function App() {
           <Route path="/startup/:id" element={<StartupDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/founder/dashboard" element={<FounderDashboard />} />
-          <Route path="/founder/create-startup" element={<CreateStartupPage />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/founder/dashboard" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={['founder']}>
+                <FounderDashboard />
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
+          <Route path="/founder/create-startup" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={['founder']}>
+                <CreateStartupPage />
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute>
+              <RoleRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </RoleRoute>
+            </ProtectedRoute>
+          } />
 
           {/* ── Exercises Route (Exercise 16-20) ─────────────────────────── */}
           <Route

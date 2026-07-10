@@ -108,6 +108,42 @@ export const MOCK_STARTUPS = [
     status: 'rejected',
     updates: [],
   },
+  {
+    id: 6,
+    name: 'Kigali Agri Hub',
+    sector: 'AgriTech',
+    raised: 45000,
+    goal: 60000,
+    backers: 98,
+    teamSize: 5,
+    founded: '2025',
+    location: 'Kigali, Rwanda',
+    description:
+      'Providing smart solar dryers and cold storage solutions to post-harvest rural farming cooperatives in Rwanda.',
+    image:
+      'https://images.unsplash.com/photo-1589923188900-85dae44094ad?auto=format&fit=crop&w=800&q=80',
+    tag: 'Sustainable',
+    status: 'active',
+    updates: [],
+  },
+  {
+    id: 7,
+    name: 'Bahir Dar Tex',
+    sector: 'Technology',
+    raised: 15000,
+    goal: 50000,
+    backers: 45,
+    teamSize: 3,
+    founded: '2024',
+    location: 'Bahir Dar, Ethiopia',
+    description:
+      'Creating local digital textile weavers hubs combining hand-weaving heritage with smart modern design software templates.',
+    image:
+      'https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=800&q=80',
+    tag: 'Cultural Heritage',
+    status: 'active',
+    updates: [],
+  },
 ];
 
 // ── Campaigns (investment rounds) ─────────────────────────────────────────────
